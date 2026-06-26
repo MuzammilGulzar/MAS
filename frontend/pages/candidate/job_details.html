@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Details</title>
+    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+</head>
+
+<body class="bg-gray-100">
+
+    <div id="navbar"></div>
+    <div class="max-w-4xl mx-auto p-8">
+
+        <div class="bg-white p-8 rounded-xl shadow">
+
+            <h1 id="title" class="text-4xl font-bold mb-4">
+            </h1>
+
+            <p id="description" class="text-gray-700 mb-6">
+            </p>
+
+            <div class="mb-4">
+                <strong>Required Skills:</strong>
+                <span id="skills"></span>
+            </div>
+
+            <div class="mb-6">
+                <strong>Experience Level:</strong>
+                <span id="experience"></span>
+            </div>
+
+            <!-- <button
+            onclick="applyJob()"
+            class="bg-green-600 text-white px-6 py-3 rounded-lg"
+        >
+            Apply Now
+        </button> -->
+            <button onclick="goToApply()" class="bg-green-600 text-white px-6 py-3 rounded-lg">
+                Apply Now
+            </button>
+
+        </div>
+
+    </div>
+    <script src="../../src/js/navbar.js"></script>
+
+    <script>
+        loadNavbar("../../components/navbar.html");
+    </script>
+    <script>
+        
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            )
+
+        const jobId = params.get("id")
+
+        async function loadJob() {
+
+            const response =
+                await fetch(
+                    `http://127.0.0.1:8000/jobs/${jobId}`
+                )
+
+            const job = await response.json()
+
+            document.getElementById("title")
+                .innerText = job.title
+
+            document.getElementById("description")
+                .innerText = job.description
+
+            document.getElementById("skills")
+                .innerText = job.required_skills
+
+            document.getElementById("experience")
+                .innerText = job.experience_level
+        }
+
+        async function applyJob() {
+
+            const candidateId = 1
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/apply",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        candidate_id: candidateId,
+                        job_id: Number(jobId)
+                    })
+                }
+            )
+
+            const result = await response.json()
+
+            alert(result.message)
+        }
+
+        loadJob()
+
+        function goToApply() {
+            window.location.href =
+                `apply.html?id=${jobId}`
+        }
+    </script>
+
+</body>
+
+</html>

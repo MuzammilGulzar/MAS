@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="../../src/js/auth_guard.js" type="module"></script>
+    <script type="module">
+        import { requireHR } from "../../src/js/auth_quard.js";
+        requireHR();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post a Job - MAS</title>
+    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <div id="navbar"></div>
+
+    <div class="max-w-2xl mx-auto px-6 py-10">
+        <a href="hr_dashboard.html" class="text-blue-600 hover:underline text-sm mb-6 block">← Back to Dashboard</a>
+
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <h1 class="text-2xl font-bold text-gray-900 mb-1">Post a New Job</h1>
+            <p class="text-gray-500 text-sm mb-6">Fill in the details. Candidates will be screened by AI.</p>
+
+            <div id="message" class="hidden mb-4 px-4 py-3 rounded-xl text-sm font-medium"></div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Job Title <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" id="title" placeholder="e.g. Python Backend Developer"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Job Description <span
+                            class="text-red-500">*</span></label>
+                    <textarea id="description" rows="5" placeholder="Describe the role and responsibilities..."
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Required Skills <span
+                            class="text-red-500">*</span></label>
+                    <input type="text" id="skills" placeholder="Python, FastAPI, PostgreSQL"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-400 mt-1">Separate skills with commas</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Experience Level <span
+                            class="text-red-500">*</span></label>
+                    <select id="experience"
+                        class="w-full border border-gray-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Select level...</option>
+                        <option value="Fresher / No Experience">Fresher / No Experience</option>
+                        <option value="Entry Level (0-1 years)">Entry Level (0-1 years)</option>
+                        <option value="Junior (1-2 years)">Junior (1-2 years)</option>
+                        <option value="Mid-Level (2-4 years)">Mid-Level (2-4 years)</option>
+                        <option value="Senior (4+ years)">Senior (4+ years)</option>
+                    </select>
+                </div>
+                <button onclick="createJob()" id="submitBtn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold transition">
+                    Post Job
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function createJob() {
+            const title = document.getElementById("title").value.trim()
+            const description = document.getElementById("description").value.trim()
+            const skills = document.getElementById("skills").value.trim()
+            const experience = document.getElementById("experience").value
+            const msg = document.getElementById("message")
+
+            if (!title || !description || !skills || !experience) {
+                msg.className = "block mb-4 px-4 py-3 rounded-xl text-sm font-medium bg-red-50 text-red-700"
+                msg.textContent = "Please fill in all fields"
+                return
+            }
+
+            // ── AUTH TOKEN ──────────────────────────────────────────────
+            const token = localStorage.getItem("access_token")
+            if (!token) {
+                alert("You are not logged in")
+                window.location.href = "../../components/login.html"
+                return
+            }
+
+            const btn = document.getElementById("submitBtn")
+            btn.disabled = true
+            btn.textContent = "Posting..."
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/jobs", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`   // ← FIXED
+                    },
+                    body: JSON.stringify({ title, description, required_skills: skills, experience_level: experience })
+                })
+
+                const data = await response.json()
+
+                if (response.ok) {
+                    msg.className = "block mb-4 px-4 py-3 rounded-xl text-sm font-medium bg-green-50 text-green-700"
+                    msg.textContent = "Job posted successfully!"
+                    document.getElementById("title").value = ""
+                    document.getElementById("description").value = ""
+                    document.getElementById("skills").value = ""
+                    document.getElementById("experience").value = ""
+                    setTimeout(() => { window.location.href = "hr_dashboard.html" }, 1500)
+                } else {
+                    msg.className = "block mb-4 px-4 py-3 rounded-xl text-sm font-medium bg-red-50 text-red-700"
+                    msg.textContent = data.detail || "Failed to create job"
+                }
+            } catch (err) {
+                msg.className = "block mb-4 px-4 py-3 rounded-xl text-sm font-medium bg-red-50 text-red-700"
+                msg.textContent = "Cannot connect to server"
+            }
+
+            btn.disabled = false
+            btn.textContent = "Post Job"
+        }
+
+        const _ns = document.createElement("script")
+        _ns.src = "../../src/js/navbar.js"
+        _ns.onload = () => loadNavbar("../../components/navbar.html")
+        document.head.appendChild(_ns)
+    </script>
+</body>
+
+</html>

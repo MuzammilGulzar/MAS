@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="../../src/js/auth_quard.js" type="module"></script>
+    <script type="module">
+        import { requireHR } from "../../src/js/auth_quard.js";
+        requireHR();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications - MAS HR</title>
+    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <div id="navbar"></div>
+
+    <div class="max-w-6xl mx-auto px-6 py-10">
+
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">All Applications</h1>
+                <p class="text-gray-500 mt-1">Review candidates and make hiring decisions</p>
+            </div>
+            <select id="statusFilter" onchange="filterApplications()"
+                class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="all">All Statuses</option>
+                <option value="applied">Applied</option>
+                <option value="interview_pending">Interview Pending</option>
+                <option value="interview_completed">Interview Completed</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="hired">Hired</option>
+                <option value="rejected">Rejected</option>
+            </select>
+        </div>
+
+        <div id="loading" class="text-center py-12">
+            <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3">
+            </div>
+            <p class="text-gray-500">Loading applications...</p>
+        </div>
+
+        <div id="empty" class="hidden text-center py-16 bg-white rounded-2xl">
+            <p class="text-4xl mb-4">📋</p>
+            <p class="text-gray-500">No applications found</p>
+        </div>
+
+        <div id="tableContainer" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                            Candidate</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Job
+                        </th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                            Resume Score</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                            Interview Score</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                            Status</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                            Decision</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("access_token")
+        const AUTH = { "Authorization": `Bearer ${token}` }
+
+        let allApplications = []
+
+        const STATUS_COLORS = {
+            "applied": "gray",
+            "interview_pending": "blue",
+            "interview_in_progress": "yellow",
+            "interview_completed": "purple",
+            "shortlisted": "green",
+            "hired": "green",
+            "rejected": "red",
+            "eligible": "green",
+            "not_eligible": "red",
+        }
+
+        function badge(status) {
+            const color = STATUS_COLORS[status] || "gray"
+            const label = status ? status.replace(/_/g, " ") : "—"
+            return `<span class="bg-${color}-100 text-${color}-700 text-xs px-2.5 py-1 rounded-full font-medium capitalize">${label}</span>`
+        }
+
+        function decisionButtons(app) {
+            // Only show decision buttons if interview is completed and no final decision yet
+            const decidable = app.status === "interview_completed"
+            if (!decidable) return "—"
+
+            return `
+        <div class="flex gap-2">
+            <button onclick="makeDecision(${app.application_id}, 'shortlisted')"
+                class="text-xs bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded-lg font-medium transition">
+                Shortlist
+            </button>
+            <button onclick="makeDecision(${app.application_id}, 'hired')"
+                class="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded-lg font-medium transition">
+                Hire
+            </button>
+            <button onclick="makeDecision(${app.application_id}, 'rejected')"
+                class="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded-lg font-medium transition">
+                Reject
+            </button>
+        </div>`
+        }
+
+        async function loadApplications() {
+            try {
+                // ── FIXED: correct endpoint + auth token ────────────────
+                const res = await fetch("http://127.0.0.1:8000/hr/applications", { headers: AUTH })
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}))
+                    throw new Error(err.detail || "Failed to load")
+                }
+
+                allApplications = await res.json()
+                document.getElementById("loading").classList.add("hidden")
+                renderTable(allApplications)
+            } catch (e) {
+                document.getElementById("loading").innerHTML =
+                    `<p class="text-red-500 text-center">${e.message}</p>`
+            }
+        }
+
+        function renderTable(apps) {
+            if (!apps.length) {
+                document.getElementById("empty").classList.remove("hidden")
+                document.getElementById("tableContainer").classList.add("hidden")
+                return
+            }
+
+            document.getElementById("empty").classList.add("hidden")
+            document.getElementById("tableContainer").classList.remove("hidden")
+
+            const tbody = document.getElementById("tableBody")
+            tbody.innerHTML = ""
+
+            apps.forEach(app => {
+                const resumeScore = app.resume_score ? `${app.resume_score}/100` : "—"
+                const interviewScore = app.interview_report ? `${app.interview_report.overall_score}/10` : "—"
+                const applied = app.applied_at
+                    ? new Date(app.applied_at).toLocaleDateString("en-US", { day: "numeric", month: "short" })
+                    : "—"
+
+                tbody.innerHTML += `
+            <tr class="hover:bg-gray-50 transition" id="row-${app.application_id}">
+                <td class="px-6 py-4">
+                    <div class="font-medium text-gray-900 text-sm">${app.candidate_name}</div>
+                    <div class="text-xs text-gray-400">${app.candidate_email}</div>
+                    <div class="text-xs text-gray-300">${applied}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">${app.job_title}</div>
+                    <div class="text-xs text-gray-400">${app.job_fit || ""}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-sm font-semibold text-gray-700">${resumeScore}</span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-sm font-semibold text-gray-700">${interviewScore}</span>
+                    ${app.interview_report ? `<div class="text-xs text-gray-400">${app.interview_report.recommendation || ""}</div>` : ""}
+                </td>
+                <td class="px-6 py-4">${badge(app.status)}</td>
+                <td class="px-6 py-4" id="decision-${app.application_id}">${decisionButtons(app)}</td>
+            </tr>`
+            })
+        }
+
+        async function makeDecision(applicationId, decision) {
+            const label = { shortlisted: "shortlist", hired: "hire", rejected: "reject" }[decision]
+            if (!confirm(`Are you sure you want to ${label} this candidate?`)) return
+
+            try {
+                const res = await fetch(`http://127.0.0.1:8000/hr/applications/${applicationId}/decision`, {
+                    method: "PATCH",
+                    headers: { ...AUTH, "Content-Type": "application/json" },
+                    body: JSON.stringify({ decision })
+                })
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}))
+                    alert(err.detail || "Failed to update decision")
+                    return
+                }
+
+                // Update the row in place without full reload
+                const decisionCell = document.getElementById(`decision-${applicationId}`)
+                if (decisionCell) decisionCell.innerHTML = badge(decision)
+
+                // Update local data
+                const app = allApplications.find(a => a.application_id === applicationId)
+                if (app) app.status = decision
+
+                // Update status cell
+                const row = document.getElementById(`row-${applicationId}`)
+                if (row) {
+                    const statusCell = row.querySelectorAll("td")[4]
+                    if (statusCell) statusCell.innerHTML = badge(decision)
+                }
+
+            } catch (e) {
+                alert("Cannot connect to server")
+            }
+        }
+
+        function filterApplications() {
+            const filter = document.getElementById("statusFilter").value
+            renderTable(filter === "all" ? allApplications : allApplications.filter(a => a.status === filter))
+        }
+
+        const _ns = document.createElement("script")
+        _ns.src = "../../src/js/navbar.js"
+        _ns.onload = () => loadNavbar("../../components/navbar.html")
+        document.head.appendChild(_ns)
+
+        loadApplications()
+    </script>
+</body>
+
+</html>

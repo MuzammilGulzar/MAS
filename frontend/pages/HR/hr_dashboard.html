@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="../../src/js/auth_guard.js" type="module"></script>
+    <script type="module">
+        import { requireHR } from "../../src/js/auth_quard.js";
+        requireHR();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Dashboard - MAS</title>
+    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <div id="navbar"></div>
+
+    <div class="max-w-6xl mx-auto px-6 py-10">
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">HR Dashboard</h1>
+            <p class="text-gray-500 mt-1">Overview of your recruitment activity</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                <div id="statJobs" class="text-3xl font-bold text-blue-600">—</div>
+                <div class="text-sm text-gray-500 mt-1">Open Jobs</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                <div id="statApps" class="text-3xl font-bold text-purple-600">—</div>
+                <div class="text-sm text-gray-500 mt-1">Applications</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                <div id="statInterviews" class="text-3xl font-bold text-green-600">—</div>
+                <div class="text-sm text-gray-500 mt-1">Interviews Done</div>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
+                <div id="statShortlisted" class="text-3xl font-bold text-orange-600">—</div>
+                <div class="text-sm text-gray-500 mt-1">Shortlisted</div>
+            </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="grid md:grid-cols-2 gap-4 mb-10">
+            <a href="create_job.html"
+                class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-2xl transition flex items-center gap-4">
+                <span class="text-3xl">➕</span>
+                <div>
+                    <div class="font-bold">Post New Job</div>
+                    <div class="text-blue-200 text-sm">Create a job listing</div>
+                </div>
+            </a>
+            <a href="applications.html"
+                class="bg-white hover:bg-gray-50 border border-gray-200 p-6 rounded-2xl transition flex items-center gap-4">
+                <span class="text-3xl">👥</span>
+                <div>
+                    <div class="font-bold text-gray-900">View Applications</div>
+                    <div class="text-gray-500 text-sm">Review all candidates</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Your Jobs list -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Your Job Listings</h2>
+                <a href="create_job.html" class="text-blue-600 hover:underline text-sm font-medium">+ Post Job</a>
+            </div>
+
+            <div id="jobsLoading" class="text-center py-6">
+                <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+            </div>
+            <div id="jobsEmpty" class="hidden text-center py-6 text-gray-400">No jobs posted yet.</div>
+            <div id="jobsList" class="space-y-3"></div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("access_token")
+        const AUTH = { "Authorization": `Bearer ${token}` }
+
+        async function loadStats() {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/hr/stats", { headers: AUTH })  // ← FIXED
+                const data = await res.json()
+                document.getElementById("statJobs").textContent = data.total_jobs
+                document.getElementById("statApps").textContent = data.total_applications
+                document.getElementById("statInterviews").textContent = data.completed_interviews
+                document.getElementById("statShortlisted").textContent = data.shortlisted
+            } catch (e) { console.error("Failed to load stats", e) }
+        }
+
+        async function loadJobs() {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/hr/jobs", { headers: AUTH })  // ← FIXED
+                const jobs = await res.json()
+
+                document.getElementById("jobsLoading").classList.add("hidden")
+
+                if (!jobs.length) {
+                    document.getElementById("jobsEmpty").classList.remove("hidden")
+                    return
+                }
+
+                const list = document.getElementById("jobsList")
+                list.innerHTML = ""
+
+                jobs.forEach(job => {
+                    const isActive = (job.status || "active") === "active"
+                    const statusColor = isActive ? "green" : "gray"
+                    list.innerHTML += `
+                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
+                    <div>
+                        <h3 class="font-semibold text-gray-900">${job.title}</h3>
+                        <p class="text-sm text-gray-500">${job.experience_level}</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-${statusColor}-100 text-${statusColor}-700 text-xs px-2.5 py-1 rounded-full font-medium">
+                            ${job.status || "active"}
+                        </span>
+                        <button onclick="toggleStatus(${job.id}, '${job.status || 'active'}')"
+                            class="text-xs text-gray-500 hover:text-gray-800 border border-gray-300 px-3 py-1 rounded-lg transition">
+                            ${isActive ? "Close" : "Reopen"}
+                        </button>
+                        <button onclick="deleteJob(${job.id})"
+                            class="text-xs text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg transition">
+                            Delete
+                        </button>
+                    </div>
+                </div>`
+                })
+            } catch (e) {
+                document.getElementById("jobsLoading").innerHTML =
+                    `<p class="text-red-500 text-center text-sm">Failed to load jobs</p>`
+            }
+        }
+
+        async function toggleStatus(jobId, currentStatus) {
+            const newStatus = currentStatus === "closed" ? "active" : "closed"
+            try {
+                const res = await fetch(`http://127.0.0.1:8000/hr/jobs/${jobId}/status`, {
+                    method: "PATCH",
+                    headers: { ...AUTH, "Content-Type": "application/json" },  // ← FIXED
+                    body: JSON.stringify({ status: newStatus })
+                })
+                if (!res.ok) { alert("Failed to update status"); return }
+                loadJobs()
+                loadStats()
+            } catch (e) { alert("Cannot connect to server") }
+        }
+
+        async function deleteJob(jobId) {
+            if (!confirm("Delete this job? This cannot be undone.")) return
+            try {
+                const res = await fetch(`http://127.0.0.1:8000/hr/jobs/${jobId}`, {
+                    method: "DELETE",
+                    headers: AUTH   // ← FIXED
+                })
+                if (!res.ok) { alert("Failed to delete job"); return }
+                loadJobs()
+                loadStats()
+            } catch (e) { alert("Cannot connect to server") }
+        }
+
+        const _ns = document.createElement("script")
+        _ns.src = "../../src/js/navbar.js"
+        _ns.onload = () => loadNavbar("../../components/navbar.html")
+        document.head.appendChild(_ns)
+
+        loadStats()
+        loadJobs()
+    </script>
+</body>
+
+</html>

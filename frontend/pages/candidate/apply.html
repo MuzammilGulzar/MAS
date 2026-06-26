@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Apply For Job</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <div class="max-w-4xl mx-auto mt-10">
+
+        <div id="navbar"></div>
+
+        <div class="bg-white p-8 rounded-xl shadow">
+
+            <h1 class="text-3xl font-bold mb-2">Apply For Job</h1>
+            <p class="text-gray-500 mb-6">Upload your resume to check eligibility</p>
+
+            <input type="file" id="resumeFile" accept=".pdf,.docx" class="mb-4 block">
+
+            <button
+                onclick="checkEligibility()"
+                id="checkBtn"
+                class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition">
+                Check Eligibility
+            </button>
+
+        </div>
+
+        <div id="resultContainer" class="mt-6"></div>
+
+    </div>
+
+    <script src="../../src/js/navbar.js"></script>
+    <script>
+        loadNavbar("../../components/navbar.html");
+    </script>
+
+    <script>
+        const params = new URLSearchParams(window.location.search)
+        const jobId = params.get("id")
+
+        // Stored after eligibility check succeeds
+        let applicationId = null
+
+        async function checkEligibility() {
+            const file = document.getElementById("resumeFile").files[0]
+
+            if (!file) {
+                alert("Please upload your resume")
+                return
+            }
+
+            const token = localStorage.getItem("access_token")
+            if (!token) {
+                alert("You must be logged in to apply")
+                window.location.href = "../../components/login.html"
+                return
+            }
+
+            const btn = document.getElementById("checkBtn")
+            btn.disabled = true
+            btn.textContent = "Checking..."
+
+            const formData = new FormData()
+            formData.append("file", file)
+            formData.append("job_id", jobId)
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/check-eligibility", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: formData
+                })
+
+                const result = await response.json()
+
+                if (!response.ok) {
+                    alert(result.detail || "Something went wrong")
+                    btn.disabled = false
+                    btn.textContent = "Check Eligibility"
+                    return
+                }
+
+                // Store application_id for the interview start call
+                if (result.application_id) {
+                    applicationId = result.application_id
+                    localStorage.setItem("application_id", applicationId)
+                    localStorage.setItem("resume_file_name", file.name)
+                }
+
+                displayResult(result)
+
+            } catch (err) {
+                console.error(err)
+                alert("Cannot connect to server")
+            } finally {
+                btn.disabled = false
+                btn.textContent = "Check Eligibility"
+            }
+        }
+
+        function displayResult(result) {
+            const container = document.getElementById("resultContainer")
+
+            if (result.eligible) {
+                container.innerHTML = `
+                    <div class="bg-green-100 p-6 rounded-xl">
+                        <h2 class="text-2xl font-bold text-green-700">✅ You're Eligible!</h2>
+
+                        <p class="mt-3 text-gray-700">
+                            <strong>Eligibility Score:</strong> ${result.score}/100
+                        </p>
+
+                        <ul class="mt-3 space-y-1">
+                            ${result.reasons.map(r => `<li>• ${r}</li>`).join("")}
+                        </ul>
+
+                        <button
+                            onclick="goToInterview()"
+                            class="mt-5 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold transition">
+                            Start Interview →
+                        </button>
+                    </div>
+                `
+            } else {
+                container.innerHTML = `
+                    <div class="bg-red-100 p-6 rounded-xl">
+                        <h2 class="text-2xl font-bold text-red-700">❌ Not Eligible</h2>
+
+                        <p class="mt-2 text-gray-600">
+                            Your profile doesn't meet the requirements for this role.
+                        </p>
+
+                        <ul class="mt-3 space-y-1">
+                            ${result.reasons.map(r => `<li>• ${r}</li>`).join("")}
+                        </ul>
+                    </div>
+                `
+            }
+        }
+
+        function goToInterview() {
+            // Pass application_id and job_id to the interview page via URL
+            const appId = applicationId || localStorage.getItem("application_id")
+
+            if (!appId) {
+                alert("Application ID missing. Please check eligibility again.")
+                return
+            }
+
+            window.location.href = `../interview.html?application_id=${appId}&job_id=${jobId}`
+        }
+
+    </script>
+
+</body>
+</html>

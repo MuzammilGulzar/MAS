@@ -1,0 +1,67 @@
+/* body {
+    font-family: Arial, sans-serif;
+} */
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family:
+        Inter,
+        system-ui,
+        sans-serif;
+}
+
+/* Custom scrollbar */
+
+#chatBox::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chatBox::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+#chatBox::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 999px;
+}
+
+/* AI Message Bubble */
+
+.ai-message {
+    background: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 14px;
+    border-radius: 14px;
+    max-width: 85%;
+}
+
+/* User Message Bubble */
+
+.user-message {
+    background: #dcfce7;
+    margin-left: auto;
+    padding: 14px;
+    border-radius: 14px;
+    max-width: 85%;
+}
+
+/* Summary cards */
+
+.skill-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 16px;
+    border-radius: 14px;
+}
+
+/* Report sections */
+
+.report-section {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+}

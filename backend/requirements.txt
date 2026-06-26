@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+groq
+pymupdf
+python-docx
+python-multipart
+pydantic
+python-dotenv
+huggingface_hub
+python-jose
+passlib
+bcrypt==4.0.1
+psycopg2-binary
+sqlalchemy
+alembic

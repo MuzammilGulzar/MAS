@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Auth guard: runs before page content, redirects if unauthorized -->
+    <script src="../../src/js/auth-guard.js"></script>
+    <script>requireHR()</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Applications - MAS HR</title>
+    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <div id="navbar"></div>
+
+    <div class="max-w-6xl mx-auto px-6 py-10">
+
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">All Applications</h1>
+                <p class="text-gray-500 mt-1">Review candidates and manage their status</p>
+            </div>
+            <!-- Filter -->
+            <select id="statusFilter" onchange="filterApplications()"
+                class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="all">All Statuses</option>
+                <option value="interview_pending">Interview Pending</option>
+                <option value="interview_completed">Interview Completed</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="rejected">Rejected</option>
+            </select>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="text-center py-12">
+            <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3"></div>
+            <p class="text-gray-500">Loading applications...</p>
+        </div>
+
+        <!-- Empty -->
+        <div id="empty" class="hidden text-center py-16 bg-white rounded-2xl">
+            <p class="text-4xl mb-4">📋</p>
+            <p class="text-gray-500">No applications found</p>
+        </div>
+
+        <!-- Table -->
+        <div id="tableContainer" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-100">
+                    <tr>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Candidate</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Job</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Resume Score</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Eligibility</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+<script>
+
+let allApplications = []
+
+const STATUS_COLORS = {
+    "applied":              "gray",
+    "interview_pending":    "blue",
+    "interview_completed":  "purple",
+    "shortlisted":          "green",
+    "rejected":             "red",
+    "ineligible":           "red",
+    "eligible":             "green"
+}
+
+function badge(status) {
+    const color = STATUS_COLORS[status] || "gray"
+    const label = status ? status.replace(/_/g, " ") : "—"
+    return `<span class="bg-${color}-100 text-${color}-700 text-xs px-2.5 py-1 rounded-full font-medium capitalize">${label}</span>`
+}
+
+async function loadApplications() {
+    try {
+        const response = await fetch("http://127.0.0.1:8000/hr/applications")
+        allApplications = await response.json()
+        document.getElementById("loading").classList.add("hidden")
+        renderTable(allApplications)
+    } catch (e) {
+        document.getElementById("loading").innerHTML =
+            `<p class="text-red-500 text-center">Failed to load. Check backend connection.</p>`
+    }
+}
+
+function renderTable(apps) {
+    if (!apps.length) {
+        document.getElementById("empty").classList.remove("hidden")
+        document.getElementById("tableContainer").classList.add("hidden")
+        return
+    }
+
+    document.getElementById("empty").classList.add("hidden")
+    document.getElementById("tableContainer").classList.remove("hidden")
+
+    const tbody = document.getElementById("tableBody")
+    tbody.innerHTML = ""
+
+    apps.forEach(app => {
+        const score = app.resume_score ? `${app.resume_score}/100` : "—"
+        const applied = app.applied_at
+            ? new Date(app.applied_at).toLocaleDateString("en-US", { day: "numeric", month: "short" })
+            : "—"
+
+        tbody.innerHTML += `
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-6 py-4">
+                    <div class="font-medium text-gray-900 text-sm">Candidate #${app.candidate_id}</div>
+                    <div class="text-xs text-gray-400">${applied}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-sm text-gray-900">${app.job_title}</div>
+                    <div class="text-xs text-gray-400">${app.job_fit || ""}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-sm font-semibold text-gray-700">${score}</span>
+                </td>
+                <td class="px-6 py-4">${badge(app.eligibility_status)}</td>
+                <td class="px-6 py-4">${badge(app.status)}</td>
+                <td class="px-6 py-4">
+                    <a href="application_details.html?id=${app.application_id}"
+                        class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        Review →
+                    </a>
+                </td>
+            </tr>
+        `
+    })
+}
+
+function filterApplications() {
+    const filter = document.getElementById("statusFilter").value
+    if (filter === "all") {
+        renderTable(allApplications)
+    } else {
+        renderTable(allApplications.filter(a => a.status === filter))
+    }
+}
+
+// Load navbar
+const _ns = document.createElement("script");
+_ns.src = "../../src/js/navbar.js";
+_ns.onload = () => loadNavbar("../../components/navbar.html");
+document.head.appendChild(_ns);
+
+loadApplications()
+
+</script>
+
+</body>
+</html>
