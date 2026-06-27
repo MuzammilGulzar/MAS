@@ -973,3 +973,109 @@ def make_hiring_decision(
     db.commit()
 
     return {"message": f"Candidate {decision}", "application_id": application_id}
+
+
+# ------------------------------------------------------------------
+# PRACTICE INTERVIEW — no auth, no application required
+# ------------------------------------------------------------------
+ 
+@app.post("/practice/start")
+async def practice_start(file: UploadFile = File(...)):
+    """
+    Practice interview — open to anyone, no login required.
+    No database writes. Pure in-memory session.
+    """
+    try:
+        file_bytes = await file.read()
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="No file provided")
+ 
+        resume_text = extract_resume_text(
+            file_bytes=file_bytes,
+            filename=file.filename.lower(),
+        )
+        if not resume_text.strip():
+            raise HTTPException(status_code=422, detail="Could not extract text from resume")
+ 
+        analysis_result  = analyze_resume(resume_text)
+        interview_plan   = create_interview_plan(analysis_result)
+        session          = create_interview_session(analysis_result, interview_plan)
+        first_question   = generate_next_question(session)
+ 
+        set_current_question(session["session_id"], first_question)
+ 
+        return {
+            "session_id":      session["session_id"],
+            "resume_analysis": analysis_result,
+            "interview_plan":  interview_plan,
+            "first_question": {
+                "question_id":  first_question.question_id,
+                "skill":        first_question.skill,
+                "difficulty":   first_question.difficulty,
+                "question":     first_question.question,
+            },
+            "progress": {
+                "current": 1,
+                "total":   interview_plan.total_questions,
+                "current_skill": first_question.skill,
+            }
+        }
+ 
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to start practice: {str(e)}")
+ 
+ 
+@app.post("/practice/answer")
+async def practice_answer(data: dict):
+    """
+    Submit an answer in a practice session.
+    No DB writes — purely in-memory.
+    """
+    session_id       = data.get("session_id")
+    candidate_answer = data.get("answer", "").strip()
+ 
+    if not session_id or not candidate_answer:
+        raise HTTPException(status_code=400, detail="session_id and answer are required")
+ 
+    if session_id not in session_store:
+        raise HTTPException(status_code=404, detail="Practice session not found or expired")
+ 
+    session          = session_store[session_id]
+    current_question = session["current_question"]
+ 
+    try:
+        evaluation       = evaluate_answer(current_question, candidate_answer)
+        updated_session  = save_answer_evaluation(session_id, candidate_answer, evaluation)
+ 
+        if not should_continue_interview(updated_session):
+            final_report = generate_final_report(updated_session)
+            return {
+                "type":         "completed",
+                "evaluation":   evaluation,
+                "final_report": final_report,
+            }
+ 
+        next_question = generate_next_question(updated_session)
+        set_current_question(session_id, next_question)
+ 
+        return {
+            "type":       "question",
+            "evaluation": evaluation,
+            "next_question": {
+                "question_id": next_question.question_id,
+                "skill":       next_question.skill,
+                "difficulty":  next_question.difficulty,
+                "question":    next_question.question,
+            },
+            "progress": {
+                "current": len(updated_session["answers"]) + 1,
+                "total":   updated_session["interview_plan"].total_questions,
+                "current_skill": next_question.skill,
+            }
+        }
+ 
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to process answer: {str(e)}")
+ 

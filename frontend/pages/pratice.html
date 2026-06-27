@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Practice Interview - MAS</title>
+    <link rel="stylesheet" href="../dist/css/tailwind.css">
+</head>
+
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Hero -->
+    <section class="bg-gradient-to-r from-purple-600 to-indigo-700">
+        <div class="max-w-5xl mx-auto px-6 py-14 text-center">
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/20 text-white text-sm mb-4">
+                🎯 Practice Mode — No account needed
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
+                Practice Interview
+            </h1>
+            <p class="text-purple-100 text-lg max-w-xl mx-auto">
+                Upload your resume, get AI-generated questions tailored to your skills, and practise answering them with
+                instant feedback.
+            </p>
+        </div>
+    </section>
+
+    <div class="max-w-4xl mx-auto px-6 -mt-8 pb-16">
+
+        <!-- Upload Card -->
+        <div id="uploadCard" class="bg-white rounded-3xl shadow-xl p-8 mb-6">
+            <h2 class="text-xl font-bold text-slate-800 mb-1">Upload Your Resume</h2>
+            <p class="text-slate-500 text-sm mb-5">PDF or DOCX • Max 10MB</p>
+
+            <label
+                class="block border-2 border-dashed border-slate-200 hover:border-purple-400 rounded-2xl p-10 text-center transition cursor-pointer"
+                id="dropZone">
+                <input type="file" id="resumeFile" accept=".pdf,.docx" class="hidden">
+                <div class="text-4xl mb-3">📄</div>
+                <p class="font-semibold text-slate-700" id="fileLabel">Click to upload resume</p>
+                <p class="text-sm text-slate-400 mt-1">Drag & drop also works</p>
+            </label>
+
+            <button onclick="startPractice()" id="startBtn"
+                class="mt-5 w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-semibold text-lg transition shadow-md">
+                Start Practice Interview →
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden bg-white rounded-3xl shadow-lg p-10 text-center mb-6">
+            <div
+                class="w-14 h-14 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4">
+            </div>
+            <h3 class="text-xl font-semibold text-slate-800">Preparing your practice interview</h3>
+            <p class="text-slate-400 mt-2 text-sm">Analysing resume and generating questions…</p>
+        </div>
+
+        <!-- Resume Summary -->
+        <div id="summary" class="hidden bg-white rounded-2xl shadow p-6 mb-6"></div>
+
+        <!-- Progress bar -->
+        <div id="progressBar" class="hidden bg-white rounded-2xl shadow p-4 mb-4">
+            <div class="flex justify-between text-sm text-slate-500 mb-2">
+                <span id="progressLabel">Question 1</span>
+                <span id="skillLabel"></span>
+            </div>
+            <div class="bg-slate-100 rounded-full h-2">
+                <div id="progressFill" class="bg-purple-500 h-2 rounded-full transition-all duration-500"
+                    style="width:0%"></div>
+            </div>
+        </div>
+
+        <!-- Chat -->
+        <div id="chatSection" class="hidden bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
+            <div class="border-b px-6 py-4 bg-slate-50 flex items-center justify-between">
+                <h2 class="text-lg font-bold text-slate-800">Interview Session</h2>
+                <span id="difficultyBadge"
+                    class="text-xs px-3 py-1 rounded-full font-medium bg-purple-100 text-purple-700"></span>
+            </div>
+            <div id="chatBox" class="h-[450px] overflow-y-auto p-6 space-y-4 bg-slate-50"></div>
+            <div class="border-t p-4 bg-white">
+                <div class="flex gap-3">
+                    <input type="text" id="answerInput" placeholder="Type your answer here…"
+                        class="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        onkeydown="if(event.key==='Enter') submitAnswer()">
+                    <button onclick="submitAnswer()" id="sendBtn"
+                        class="bg-purple-600 hover:bg-purple-700 text-white px-7 rounded-xl font-semibold transition">
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Report -->
+        <div id="finalReport" class="hidden bg-white rounded-3xl shadow-xl p-8"></div>
+
+    </div>
+
+    <script>
+        const API = "http://127.0.0.1:8000"
+        let sessionId = null
+
+        // ── Drag & drop ────────────────────────────────────────────────
+        const fileInput = document.getElementById("resumeFile")
+        const dropZone = document.getElementById("dropZone")
+        const fileLabel = document.getElementById("fileLabel")
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files[0]) fileLabel.textContent = "📎 " + fileInput.files[0].name
+        })
+        dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("border-purple-500") })
+        dropZone.addEventListener("dragleave", () => dropZone.classList.remove("border-purple-500"))
+        dropZone.addEventListener("drop", e => {
+            e.preventDefault()
+            dropZone.classList.remove("border-purple-500")
+            fileInput.files = e.dataTransfer.files
+            if (fileInput.files[0]) fileLabel.textContent = "📎 " + fileInput.files[0].name
+        })
+
+        // ── Helpers ────────────────────────────────────────────────────
+        function show(id) { document.getElementById(id).classList.remove("hidden") }
+        function hide(id) { document.getElementById(id).classList.add("hidden") }
+
+        function addMsg(type, html) {
+            const box = document.getElementById("chatBox")
+            const div = document.createElement("div")
+            if (type === "ai") {
+                div.className = "bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 text-sm text-slate-800 shadow-sm max-w-[85%]"
+            } else if (type === "user") {
+                div.className = "bg-purple-600 text-white rounded-2xl rounded-tr-sm p-4 text-sm ml-auto max-w-[85%]"
+            } else {
+                div.className = "bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm w-full"
+            }
+            div.innerHTML = html
+            box.appendChild(div)
+            box.scrollTop = box.scrollHeight
+        }
+
+        function addTyping() {
+            const box = document.getElementById("chatBox")
+            const div = document.createElement("div")
+            div.id = "typing"
+            div.className = "flex gap-1 items-center bg-white border border-slate-200 rounded-2xl p-4 w-16"
+            div.innerHTML = `<span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay:0s"></span>
+                     <span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay:.15s"></span>
+                     <span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay:.3s"></span>`
+            box.appendChild(div)
+            box.scrollTop = box.scrollHeight
+        }
+        function removeTyping() { document.getElementById("typing")?.remove() }
+
+        function updateProgress(current, total, skill, difficulty) {
+            const pct = Math.round(((current - 1) / total) * 100)
+            document.getElementById("progressFill").style.width = pct + "%"
+            document.getElementById("progressLabel").textContent = `Question ${current} of ${total}`
+            document.getElementById("skillLabel").textContent = skill ? `Skill: ${skill}` : ""
+            document.getElementById("difficultyBadge").textContent = difficulty || ""
+        }
+
+        function showResumeSummary(r, plan) {
+            const scoreColor = r.score >= 75 ? "text-green-600" : r.score >= 50 ? "text-yellow-600" : "text-red-500"
+            document.getElementById("summary").innerHTML = `
+        <div class="flex items-center gap-5 flex-wrap">
+            <div class="text-center">
+                <div class="text-3xl font-bold ${scoreColor}">${r.score}</div>
+                <div class="text-xs text-slate-400">Resume Score</div>
+            </div>
+            <div>
+                <div class="font-semibold text-slate-800">${r.job_fit}</div>
+                <div class="text-sm text-slate-500">${plan.candidate_level} · ${plan.difficulty} difficulty · ${plan.total_questions} questions</div>
+                <div class="mt-2 flex flex-wrap gap-1">
+                    ${(plan.skills_to_test || []).map(s => `<span class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">${s}</span>`).join("")}
+                </div>
+            </div>
+        </div>`
+            show("summary")
+        }
+
+        function showEvaluation(ev) {
+            const color = ev.score >= 7 ? "#16a34a" : ev.score >= 5 ? "#d97706" : "#dc2626"
+            const covered = (ev.covered_points || []).map(p => `<li>✓ ${p}</li>`).join("")
+            const missing = (ev.missing_points || []).map(p => `<li>△ ${p}</li>`).join("")
+            addMsg("eval", `
+        <div class="font-semibold mb-1" style="color:${color}">Score: ${ev.score}/10</div>
+        <p class="text-slate-600 text-sm">${ev.feedback}</p>
+        ${covered || missing ? `
+        <details class="mt-2 text-xs text-slate-500 cursor-pointer">
+            <summary>See detailed feedback</summary>
+            <ul class="mt-2 space-y-1 text-green-700">${covered}</ul>
+            <ul class="mt-1 space-y-1 text-orange-700">${missing}</ul>
+        </details>` : ""}`)
+        }
+
+        function showFinalReport(r) {
+            const recColor = r.recommendation === "Shortlist" ? "bg-green-100 text-green-700"
+                : r.recommendation === "Reject" ? "bg-red-100 text-red-700"
+                    : "bg-yellow-100 text-yellow-700"
+
+            document.getElementById("finalReport").innerHTML = `
+        <h2 class="text-2xl font-bold text-slate-800 mb-6">Practice Report</h2>
+        <div class="flex items-center gap-6 mb-6 flex-wrap">
+            <div class="text-center">
+                <div class="text-4xl font-bold ${r.overall_score >= 7 ? 'text-green-600' : r.overall_score >= 5 ? 'text-yellow-600' : 'text-red-500'}">${r.overall_score}/10</div>
+                <div class="text-xs text-slate-400 mt-1">Overall Score</div>
+            </div>
+            <span class="px-4 py-2 rounded-full text-sm font-semibold ${recColor}">${r.recommendation}</span>
+        </div>
+
+        ${Object.keys(r.skill_scores || {}).length ? `
+        <div class="mb-6">
+            <h3 class="font-semibold text-slate-700 mb-3">Skill Scores</h3>
+            ${Object.entries(r.skill_scores).map(([skill, score]) => `
+                <div class="mb-2">
+                    <div class="flex justify-between text-sm mb-1"><span>${skill}</span><span>${score}/10</span></div>
+                    <div class="bg-slate-100 rounded-full h-2">
+                        <div class="h-2 rounded-full ${score >= 7 ? 'bg-green-500' : score >= 5 ? 'bg-yellow-500' : 'bg-red-400'}" style="width:${(score / 10) * 100}%"></div>
+                    </div>
+                </div>`).join("")}
+        </div>` : ""}
+
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div>
+                <h3 class="font-semibold text-slate-700 mb-2">✅ Strengths</h3>
+                <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
+                    ${(r.strengths || []).map(s => `<li>${s}</li>`).join("")}
+                </ul>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-700 mb-2">⚠️ Weaknesses</h3>
+                <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
+                    ${(r.weaknesses || []).map(w => `<li>${w}</li>`).join("")}
+                </ul>
+            </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-xl p-5 mb-4">
+            <h3 class="font-semibold text-slate-700 mb-2">Final Feedback</h3>
+            <p class="text-sm text-slate-600 leading-relaxed">${r.final_feedback}</p>
+        </div>
+
+        ${(r.next_steps || []).length ? `
+        <div>
+            <h3 class="font-semibold text-slate-700 mb-2">➡️ Next Steps</h3>
+            <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
+                ${r.next_steps.map(s => `<li>${s}</li>`).join("")}
+            </ul>
+        </div>` : ""}
+
+        <button onclick="location.reload()"
+            class="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition">
+            ← Practice Again
+        </button>`
+
+            show("finalReport")
+            document.getElementById("finalReport").scrollIntoView({ behavior: "smooth" })
+        }
+
+        // ── Start Practice ─────────────────────────────────────────────
+        async function startPractice() {
+            const file = fileInput.files[0]
+            if (!file) { alert("Please upload your resume first"); return }
+
+            const btn = document.getElementById("startBtn")
+            btn.disabled = true
+            hide("uploadCard")
+            show("loading")
+
+            const fd = new FormData()
+            fd.append("file", file)
+
+            try {
+                const res = await fetch(`${API}/practice/start`, { method: "POST", body: fd })
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}))
+                    throw new Error(err.detail || "Failed to start practice")
+                }
+
+                const data = await res.json()
+                sessionId = data.session_id
+
+                hide("loading")
+                showResumeSummary(data.resume_analysis, data.interview_plan)
+                show("progressBar")
+                show("chatSection")
+                updateProgress(1, data.interview_plan.total_questions, data.first_question.skill, data.first_question.difficulty)
+                addMsg("ai", data.first_question.question)
+                document.getElementById("answerInput").focus()
+
+            } catch (e) {
+                hide("loading")
+                show("uploadCard")
+                btn.disabled = false
+                alert("Error: " + e.message)
+            }
+        }
+
+        // ── Submit Answer ──────────────────────────────────────────────
+        async function submitAnswer() {
+            const input = document.getElementById("answerInput")
+            const sendBtn = document.getElementById("sendBtn")
+            const answer = input.value.trim()
+
+            if (!answer) { alert("Please type an answer"); return }
+            if (!sessionId) { alert("No active session"); return }
+
+            addMsg("user", answer)
+            input.value = ""
+            input.disabled = true
+            sendBtn.disabled = true
+            sendBtn.textContent = "…"
+            addTyping()
+
+            try {
+                const res = await fetch(`${API}/practice/answer`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ session_id: sessionId, answer })
+                })
+
+                removeTyping()
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}))
+                    throw new Error(err.detail || "Failed to submit answer")
+                }
+
+                const data = await res.json()
+                showEvaluation(data.evaluation)
+
+                if (data.type === "completed") {
+                    addMsg("ai", "🎉 Practice complete! Here's your report.")
+                    hide("chatSection")
+                    hide("progressBar")
+                    showFinalReport(data.final_report)
+                    return
+                }
+
+                const p = data.progress
+                updateProgress(p.current, p.total, data.next_question.skill, data.next_question.difficulty)
+                addMsg("ai", data.next_question.question)
+
+            } catch (e) {
+                removeTyping()
+                addMsg("ai", "⚠️ " + e.message + " — please try again.")
+            } finally {
+                input.disabled = false
+                sendBtn.disabled = false
+                sendBtn.textContent = "Send"
+                input.focus()
+            }
+        }
+    </script>
+</body>
+
+</html>
