@@ -71,20 +71,22 @@ def create_access_token(data: dict):
     return token
 
 # Decode and verify JWT token
-def decode_access_token(token:str):
+def decode_access_token(token: str):
+
+    
 
     try:
-        # Verify signature
-        # Verify expiration
-        # Decode payload
-        
         payload = jwt.decode(
             token,
             SECRET_KEY,
             algorithms=[ALGORITHM]
         )
 
+       
+
         return payload
-    except JWTError:
-        # Invalid token
+
+    except Exception as e:
+        print("JWT ERROR:", str(e))
+        print("===============================\n")
         return None

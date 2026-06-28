@@ -26,12 +26,6 @@ function getToken() {
 
     const token = localStorage.getItem("access_token");
 
-    console.log("========== AUTH DEBUG ==========");
-    console.log("Token:", token);
-    console.log("Role:", localStorage.getItem("role"));
-    console.log("Username:", localStorage.getItem("username"));
-    console.log("================================");
-
     if (!token) {
         alert("Please login first.");
         window.location.href = "/frontend/components/login.html";
@@ -215,6 +209,54 @@ async function submitAnswer() {
         sendButton.innerText = "Send";
     }
 }
+async function submitVoiceAnswer() {
+
+    if (!sessionId) {
+        alert("Interview session not found.");
+        return;
+    }
+
+    const response = await uploadRecording(sessionId);
+    addMessage("user", "🎤 " + response.transcript);
+
+    
+    // Voice endpoint already evaluates the answer
+    if (response.type === "completed") {
+
+        showEvaluation(response.evaluation);
+        
+        
+        addMessage("ai", "🎉 Interview completed!");
+
+        showFinalReport(response.final_report);
+
+        document.getElementById("sendButton").disabled = true;
+        document.getElementById("answerInput").disabled = true;
+
+        return;
+    }
+
+    if (response.type === "question") {
+
+        showEvaluation(response.evaluation);
+        addMessage(
+                        "ai",
+                        `🎤 Communication Score<br>
+                        Clarity: ${response.communication.clarity}/10<br>
+                        Confidence: ${response.communication.confidence}/10<br>
+                        Fluency: ${response.communication.fluency}/10<br>
+                        Words Spoken: ${response.communication.word_count}`
+                );
+
+        currentQuestionId = response.next_question.question_id;
+
+        addMessage("ai", response.next_question.question);
+
+        return;
+    }
+
+    alert("Unexpected response from server.");
+} 
 
 // ── Final Report ──────────────────────────────────────────────────
 function showFinalReport(report) {
@@ -257,4 +299,111 @@ function showFinalReport(report) {
     `;
 
     finalReportDiv.scrollIntoView({ behavior: "smooth" });
+}function showFinalReport(report) {
+    const finalReportDiv = document.getElementById("finalReport");
+    finalReportDiv.classList.remove("hidden");
+
+    if (!report) {
+        finalReportDiv.innerHTML = `<p>Report not available.</p>`;
+        return;
+    }
+
+    const communication = report.communication_metrics || {};
+
+    finalReportDiv.innerHTML = `
+        <h2 class="text-2xl font-bold text-blue-600 mb-4">
+            Final Interview Report
+        </h2>
+
+        <p class="mb-2">
+            <strong>Overall Score:</strong> ${report.overall_score}/10
+        </p>
+
+        <p class="mb-2">
+            <strong>Recommendation:</strong> ${report.recommendation}
+        </p>
+
+        <div class="mt-4">
+            <h3 class="text-xl font-semibold mb-2">
+                Skill Scores
+            </h3>
+
+            <ul class="list-disc ml-6">
+                ${Object.entries(report.skill_scores).map(([skill, score]) =>
+                    `<li>${skill}: ${score}</li>`
+                ).join("")}
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-xl font-semibold mb-2">
+                Strengths
+            </h3>
+
+            <ul class="list-disc ml-6">
+                ${report.strengths.map(item =>
+                    `<li>${item}</li>`
+                ).join("")}
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-xl font-semibold mb-2">
+                Weaknesses
+            </h3>
+
+            <ul class="list-disc ml-6">
+                ${report.weaknesses.map(item =>
+                    `<li>${item}</li>`
+                ).join("")}
+            </ul>
+        </div>
+
+        <div class="mt-4 bg-blue-50 rounded-xl p-4">
+            <h3 class="text-xl font-semibold text-blue-700 mb-3">
+                🎤 Communication Analysis
+            </h3>
+
+            <ul class="space-y-2">
+                <li><strong>Average Clarity:</strong> ${communication.average_clarity ?? "N/A"}/10</li>
+                <li><strong>Average Confidence:</strong> ${communication.average_confidence ?? "N/A"}/10</li>
+                <li><strong>Average Fluency:</strong> ${communication.average_fluency ?? "N/A"}/10</li>
+                <li><strong>Total Words Spoken:</strong> ${communication.total_words ?? "N/A"}</li>
+            </ul>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-xl font-semibold mb-2">
+                Communication Feedback
+            </h3>
+
+            <p class="text-gray-700">
+                ${report.communication_feedback}
+            </p>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-xl font-semibold mb-2">
+                Technical Feedback
+            </h3>
+
+            <p class="text-gray-700">
+                ${report.technical_feedback}
+            </p>
+        </div>
+
+        <div class="mt-4">
+            <h3 class="text-xl font-semibold mb-2">
+                Final Feedback
+            </h3>
+
+            <p class="text-gray-700 leading-relaxed">
+                ${report.final_feedback}
+            </p>
+        </div>
+    `;
+
+    finalReportDiv.scrollIntoView({
+        behavior: "smooth"
+    });
 }

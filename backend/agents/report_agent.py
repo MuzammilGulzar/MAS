@@ -80,45 +80,43 @@ def generate_final_report(session):
     answers = session["answers"]
     evaluations = session["evaluations"]
     scores = session["scores"]
+    communication_scores = session.get("communication_scores", [])
 
     skill_scores = calculate_skill_scores(scores)
     overall_score = calculate_overall_score(evaluations)
+    if communication_scores:
 
-#     prompt = f"""
-# You are an expert interview assessor.
+        avg_clarity = round(
+                 sum(c["clarity"] for c in communication_scores) /
+                 len(communication_scores),
+                 1
+           )
 
-# Generate a final interview report for this candidate.
+        avg_confidence = round(
+             sum(c["confidence"] for c in communication_scores) /
+             len(communication_scores),
+             1
+         )
 
-# Resume Analysis:
-# {resume_analysis}
+        avg_fluency = round(
+             sum(c["fluency"] for c in communication_scores) /
+             len(communication_scores),
+             1
+         )
 
-# Interview Plan:
-# {interview_plan}
+        total_words = sum(
+                c["word_count"]
+                for c in communication_scores
+     )
 
-# Candidate Answers:
-# {answers}
+    else:
 
-# Evaluations:
-# {evaluations}
+        avg_clarity = 0
+        avg_confidence = 0
+        avg_fluency = 0
+        total_words = 0
 
-# Skill Scores:
-# {skill_scores}
 
-# Overall Score:
-# {overall_score}
-
-# Return ONLY valid JSON.
-
-# Format:
-# {{
-#   "overall_score": {overall_score},
-#   "recommendation": "Shortlist / Reject / Needs another round",
-#   "skill_scores": {skill_scores},
-#   "strengths": ["strength 1", "strength 2"],
-#   "weaknesses": ["weakness 1", "weakness 2"],
-#   "final_feedback": "short final feedback"
-# }}
-# """
     prompt = f"""
 You are an expert technical interview assessor and hiring evaluator.
 
@@ -163,11 +161,21 @@ Skill Scores:
 Overall Score:
 {overall_score}
 
+Communication Metrics:
+
+Average Clarity: {avg_clarity}/10
+
+Average Confidence: {avg_confidence}/10
+
+Average Fluency: {avg_fluency}/10
+
+Total Words Spoken: {total_words}
+
 Return the JSON in exactly this structure:
 
 {{
   "overall_score": {overall_score},
-  "score_reason":"
+  "score_reason":"",
   "recommendation": "Shortlist / Reject / Needs another round",
   "skill_scores": {skill_scores},
   "strengths": [],
@@ -177,6 +185,12 @@ Return the JSON in exactly this structure:
   "communication_feedback": "",
   "technical_feedback": "",
   "hiring_risk": "Low / Medium / High",
+  "communication_metrics": {{
+    "average_clarity": {avg_clarity},
+    "average_confidence": {avg_confidence},
+    "average_fluency": {avg_fluency},
+    "total_words": {total_words}
+}},
   "final_feedback": "",
   "next_steps": []
 }}
@@ -218,12 +232,20 @@ Important:
     try:
         content = response.choices[0].message.content
 
-        # print("\nFINAL REPORT RAW RESPONSE:\n")
-        # print(content)
 
         json_string = extract_json(content)
 
         data = json.loads(json_string)
+
+        data.setdefault(
+            "communication_metrics",
+            {
+                 "average_clarity": avg_clarity,
+                 "average_confidence": avg_confidence,
+                 "average_fluency": avg_fluency,
+                 "total_words": total_words
+            }
+            )
 
         final_report = FinalReport(**data)
 

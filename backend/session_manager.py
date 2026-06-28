@@ -34,6 +34,10 @@ def save_answer_evaluation(session_id, answer, evaluation):
         "answer": answer
     })
     session["evaluations"].append(evaluation)
+    session.setdefault("communication_scores", [])
+    session["communication_scores"].append(
+    session.get("current_communication")
+)
 
     skill = current_question.skill
 

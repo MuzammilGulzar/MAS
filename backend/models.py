@@ -81,6 +81,8 @@ class FinalReport(BaseModel):
 
     hiring_risk: str
 
+    communication_metrics: Dict[str, float]
+
     final_feedback: str
 
     next_steps: List[str]

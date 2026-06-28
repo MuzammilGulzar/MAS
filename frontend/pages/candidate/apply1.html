@@ -70,8 +70,7 @@
 
             const token = localStorage.getItem("access_token");
 
-            console.log(localStorage.getItem("access_token"));
-
+            
             const response =
                 await fetch(
                     "http://127.0.0.1:8000/check-eligibility",
@@ -150,10 +149,14 @@
 
         function startInterview() {
 
-            alert(
-                "Interview integration next"
-            )
-        }
+    localStorage.setItem(
+        "application_id",
+        result.application_id
+    );
+
+    window.location.href =
+        `/frontend/pages/interview.html?application_id=${result.application_id}&job_id=${jobId}`;
+}
 
     </script>
 

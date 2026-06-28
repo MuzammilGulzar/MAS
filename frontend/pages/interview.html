@@ -92,22 +92,33 @@
 
             <div class="border-t p-5 bg-white">
 
-                <div class="flex gap-3">
+              <div class="flex gap-3">
 
-                    <input
-                        type="text"
-                        id="answerInput"
-                        placeholder="Type your answer..."
-                        class="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <input
+            type="text"
+            id="answerInput"
+            placeholder="Type your answer..."
+            class="flex-1 border border-slate-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-                    <button
-                        id="sendButton"
-                        onclick="submitAnswer()"
-                        class="bg-green-600 hover:bg-green-700 text-white px-8 rounded-xl font-semibold transition">
-                        Send
-                    </button>
+        <button
+            id="recordButton"
+            onclick="toggleRecording()"
+            class="bg-red-600 hover:bg-red-700 text-white px-5 rounded-xl font-semibold transition">
+            🎤 Record
+        </button>
 
-                </div>
+   
+        <button
+            id="sendButton"
+            onclick="submitAnswer()"
+            class="bg-green-600 hover:bg-green-700 text-white px-8 rounded-xl font-semibold transition">
+            Send
+        </button>
+
+            </div>
+             <p id="recordStatus" class="text-sm text-gray-500 mt-3">
+                Not Recording
+                </p>
 
             </div>
 
@@ -120,11 +131,13 @@
     </div>
 
     <script src="../src/js/navbar.js"></script>
-    <script>
-        loadNavbar("../components/navbar.html");
-    </script>
 
-    <script src="../src/js/app.js"></script>
+<script>
+loadNavbar("../components/navbar.html");
+</script>
+
+<script src="../src/js/recorder.js"></script>
+<script src="../src/js/app.js"></script>
 
 </body>
 

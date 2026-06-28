@@ -1,3 +1,5 @@
+from unittest import result
+
 from fastapi import FastAPI, UploadFile, File, Depends, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -38,6 +40,7 @@ from backend.session_manager import (
     should_continue_interview,
     session_store,
 )
+from backend.agents.communication_agent import evaluate_communication
 from pydantic import BaseModel
 
 class InterviewStartRequest(BaseModel):
@@ -433,12 +436,14 @@ async def start_interview(
     """
     # -- 1. Get existing candidate (never create here) --
     candidate = get_candidate_or_404(current_user.id, db)
+    
 
     # -- 2. Validate the application belongs to this candidate --
     application = db.query(Application).filter(
         Application.id == request.application_id,
         Application.candidate_id == candidate.id,
     ).first()
+    
 
     if not application:
         raise HTTPException(status_code=404, detail="Application not found")
@@ -449,21 +454,7 @@ async def start_interview(
             detail="You must pass the eligibility check before starting the interview"
         )
 
-    # -- 3. Parse and analyse resume --
-    # file_bytes = await file.read()
-    # resume_text = extract_resume_text(
-    #     file_bytes=file_bytes,
-    #     filename=file.filename.lower(),
-    # )
-    # analysis_result = analyze_resume(resume_text)
-
-    # # Update candidate with latest resume data
-    # candidate.resume_score = analysis_result.score
-    # candidate.resume_score_reason = analysis_result.reason
-    # candidate.job_fit = analysis_result.job_fit
-    # candidate.resume_text = resume_text
-    # candidate.analysis_json = json.dumps(analysis_result.model_dump())
-    # db.commit()
+    
     if not candidate.analysis_json:
       raise HTTPException(
         status_code=400,
@@ -473,9 +464,11 @@ async def start_interview(
     analysis_result = ResumeAnalysis.model_validate(
        json.loads(candidate.analysis_json)
 )
+    
 
     # -- 4. Create interview plan --
     interview_plan = create_interview_plan(analysis_result)
+  
 
     # -- 5. Create Interview row linked to the EXISTING candidate --
     interview = Interview(
@@ -488,6 +481,7 @@ async def start_interview(
     db.add(interview)
     db.commit()
     db.refresh(interview)
+    
 
     # -- 6. Link interview back to the application --
     application.interview_id = interview.id
@@ -496,6 +490,7 @@ async def start_interview(
 
     # -- 7. Create in-memory session --
     session = create_interview_session(analysis_result, interview_plan)
+
     session["candidate_db_id"] = candidate.id
     session["interview_db_id"] = interview.id
 
@@ -513,6 +508,7 @@ async def start_interview(
 
     # -- 9. Generate and save first question --
     first_question = generate_next_question(session)
+   
 
     question_row = InterviewQuestion(
         interview_id=interview.id,
@@ -659,8 +655,59 @@ async def submit_answer(
             "question": next_question.question,
         },
     }
+# ------------------------------------------------------------------
+# voice-to-text endpoint
+# --    --------------------------------------------------------------
+from fastapi import UploadFile, File, Form
 
+from pathlib import Path
+import tempfile
+import os
 
+from backend.agents.voice_agent import speech_to_text
+
+@app.post("/interview/voice-answer")
+async def voice_answer(
+    session_id: str = Form(...),
+    audio: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    suffix = Path(audio.filename).suffix or ".webm"
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_audio:
+        temp_audio.write(await audio.read())
+        temp_path = temp_audio.name
+
+    try:
+        transcript = speech_to_text(temp_path)
+        communication = evaluate_communication(transcript)
+        session_store[session_id]["current_communication"] = communication
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+    result = await submit_answer(
+    {
+        "session_id": session_id,
+        "answer": transcript
+    },
+    db
+)
+
+    result["transcript"] = transcript
+    result["communication"] = communication
+
+    return result
+# ------------------------------------------------------------------
+# — helper function to process answer
+# ------------------------------------------------------------------
+
+def process_answer(
+    session_id: str,
+    candidate_answer: str,
+    db: Session
+):
+    pass
 # ------------------------------------------------------------------
 # INTERVIEW — GET SESSION STATE
 # ------------------------------------------------------------------
@@ -1100,3 +1147,24 @@ async def practice_answer(data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to process answer: {str(e)}")
  
+
+
+from fastapi import UploadFile, File
+import os
+from pathlib import Path
+
+@app.post("/upload-audio")
+async def upload_audio(audio: UploadFile = File(...)):
+
+    upload_dir = Path("uploads")
+    upload_dir.mkdir(exist_ok=True)
+
+    file_path = upload_dir / audio.filename
+
+    with open(file_path, "wb") as f:
+        f.write(await audio.read())
+
+    return {
+        "message": "Audio uploaded successfully",
+        "filename": audio.filename
+    }

@@ -200,12 +200,10 @@ Important:
     )
     try:
         response_content = response.choices[0].message.content
-        print("\nEVALUATION RAW RESPONSE:\n")
-        print(response_content)
+        
         json_string = extract_json(response_content)
         
-        print("\n================ EXTRACTED JSON ================\n")
-        print(json_string)
+        
         
         data = json.loads(json_string)
         evaluation_result = EvaluationResult(**data)
