@@ -315,7 +315,7 @@ Important:
         data = normalize_interview_plan_data(data)
 
         level = data.get("candidate_level", "").lower()
-
+        
         if level == "beginner":
             data["total_questions"] = 8
 
@@ -329,7 +329,7 @@ Important:
             data["total_questions"] = 25
 
         else:
-            data["total_questions"] = 12
+            data["total_questions"] = 6
 
         interview_plan = InterviewPlan(**data)
 

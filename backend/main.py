@@ -21,7 +21,7 @@ from backend import schemas
 from backend.database import Base, get_db, engine
 from backend.auth import hash_password, verify_password, create_access_token, decode_access_token
 from backend.models import EligibilityResult
-
+from backend.models import ResumeAnalysis
 from backend.resume_parser import extract_resume_text
 from backend.agents.resume_parser_agent import analyze_resume
 from backend.agents.planner_agent import create_interview_plan
@@ -29,7 +29,8 @@ from backend.agents.question_agent import generate_next_question
 from backend.agents.evaluator_agent import evaluate_answer
 from backend.agents.report_agent import generate_final_report
 from backend.agents.job_eligibility_agent import check_job_eligibility
-
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from backend.session_manager import (
     create_interview_session,
     set_current_question,
@@ -37,13 +38,25 @@ from backend.session_manager import (
     should_continue_interview,
     session_store,
 )
+from pydantic import BaseModel
 
+class InterviewStartRequest(BaseModel):
+    application_id: int
 # ------------------------------------------------------------------
 # CREATE TABLES
 # ------------------------------------------------------------------
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+app.mount(
+    "/frontend",
+    StaticFiles(directory=FRONTEND_DIR),
+    name="frontend",
+)
 
 security = HTTPBearer()
 
@@ -408,8 +421,7 @@ async def analyze(file: UploadFile = File(...)):
 
 @app.post("/interview/start")
 async def start_interview(
-    file: UploadFile = File(...),
-    application_id: int = Form(...),
+    request: InterviewStartRequest,
     db: Session = Depends(get_db),
     current_user: db_models.User = Depends(get_current_user),
 ):
@@ -424,7 +436,7 @@ async def start_interview(
 
     # -- 2. Validate the application belongs to this candidate --
     application = db.query(Application).filter(
-        Application.id == application_id,
+        Application.id == request.application_id,
         Application.candidate_id == candidate.id,
     ).first()
 
@@ -438,20 +450,29 @@ async def start_interview(
         )
 
     # -- 3. Parse and analyse resume --
-    file_bytes = await file.read()
-    resume_text = extract_resume_text(
-        file_bytes=file_bytes,
-        filename=file.filename.lower(),
-    )
-    analysis_result = analyze_resume(resume_text)
+    # file_bytes = await file.read()
+    # resume_text = extract_resume_text(
+    #     file_bytes=file_bytes,
+    #     filename=file.filename.lower(),
+    # )
+    # analysis_result = analyze_resume(resume_text)
 
-    # Update candidate with latest resume data
-    candidate.resume_score = analysis_result.score
-    candidate.resume_score_reason = analysis_result.reason
-    candidate.job_fit = analysis_result.job_fit
-    candidate.resume_text = resume_text
-    candidate.analysis_json = json.dumps(analysis_result.model_dump())
-    db.commit()
+    # # Update candidate with latest resume data
+    # candidate.resume_score = analysis_result.score
+    # candidate.resume_score_reason = analysis_result.reason
+    # candidate.job_fit = analysis_result.job_fit
+    # candidate.resume_text = resume_text
+    # candidate.analysis_json = json.dumps(analysis_result.model_dump())
+    # db.commit()
+    if not candidate.analysis_json:
+      raise HTTPException(
+        status_code=400,
+        detail="Resume not found. Please complete eligibility first."
+    )
+
+    analysis_result = ResumeAnalysis.model_validate(
+       json.loads(candidate.analysis_json)
+)
 
     # -- 4. Create interview plan --
     interview_plan = create_interview_plan(analysis_result)

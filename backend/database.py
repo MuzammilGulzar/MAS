@@ -16,7 +16,7 @@ from sqlalchemy.orm import sessionmaker, declarative_base
 
 # moved to postgresql
 # Database_URL = "sqlite:///./test.db"
-Database_URL = "postgresql://postgres:muzamil@localhost:5432/mas_ai"
+Database_URL = "postgresql://postgres:Archer%40007@localhost:5432/mas_db"
 
 # ------------------------------------------------------------------
 # CREATE DATABASE ENGINE

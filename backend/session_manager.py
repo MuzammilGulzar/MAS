@@ -50,10 +50,9 @@ def save_answer_evaluation(session_id, answer, evaluation):
     return session
 
 def should_continue_interview(session):
-    total_answered = len(session["answers"])
-    total_questions = session["interview_plan"].total_questions
+    MAX_QUESTIONS = 6
 
-    if total_answered >= total_questions:
+    if len(session["answers"]) >= MAX_QUESTIONS:
         session["status"] = "completed"
         return False
 

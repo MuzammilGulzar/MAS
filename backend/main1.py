@@ -17,7 +17,7 @@ from backend.interview_db_models import InterviewReport, InterviewSession, Job, 
 
 from backend.agents.job_eligibility_agent import check_job_eligibility
 
-from backend.models import EligibilityResult
+from backend.models import EligibilityResult, ResumeAnalysis
 
 from backend import schemas
 
@@ -255,33 +255,46 @@ async def analyze(file: UploadFile=File(...)):
 
 @app.post("/interview/start")
 async def start_interview(
-    file: UploadFile=File(...),
+    application_id: int,
     db: Session = Depends(get_db),
     current_user: db_models.User = Depends(get_current_user)
-    ):
-    file_bytes = await file.read()
+):
+   
+    candidate = db.query(Candidate).filter(
+    Candidate.user_id == current_user.id
+    ).first()
 
-    resume_text = extract_resume_text(
-        file_bytes=file_bytes,
-        filename=file.filename.lower()
+    if candidate is None:
+       raise HTTPException(
+          status_code=404,
+        detail="Candidate not found"
+    )
+    candidate = db.query(Candidate).filter(
+    Candidate.user_id == current_user.id
+).first()
+
+
+
+    application = db.query(Application).filter(
+    Application.id == application_id,
+    Application.candidate_id == candidate.id
+).first()
+
+    if application is None:
+      raise HTTPException(
+        status_code=404,
+        detail="Application not found"
+    )
+    if application.eligibility_status != "eligible":
+    raise HTTPException(
+        status_code=403,
+        detail="Complete eligibility check first."
     )
 
-    analysis_result = analyze_resume(resume_text)
-
-    candidate = Candidate(
-        resume_score=analysis_result.score,
-        resume_score_reason=analysis_result.reason,
-        candidate_level="Unknown",
-        job_fit=analysis_result.job_fit,
-        resume_text=resume_text,
-        analysis_json=json.dumps(
-            analysis_result.model_dump()
-        )
-    )
-
-    db.add(candidate)
-    db.commit()
-    db.refresh(candidate)
+    analysis_result = ResumeAnalysis.model_validate_json(
+    candidate.analysis_json
+)
+    
     interview_plan = create_interview_plan(
         analysis_result
     )
@@ -299,6 +312,10 @@ async def start_interview(
     db.add(interview)
     db.commit()
     db.refresh(interview)
+    application.interview_id = interview.id
+    application.status = "interview_in_progress"
+
+    db.commit() 
 
     session = create_interview_session(
     analysis_result,
@@ -632,6 +649,15 @@ async def check_eligibility(
             status_code=404,
             detail="Candidate profile not found. Please complete your profile first."
         )
+    candidate.resume_score = resume_analysis.score
+    candidate.resume_score_reason = resume_analysis.reason
+    candidate.job_fit = resume_analysis.job_fit
+    candidate.resume_text = resume_text
+    candidate.analysis_json = json.dumps(
+    resume_analysis.model_dump()
+)
+
+db.commit()
 
     if result.eligible:
 
