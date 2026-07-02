@@ -80,8 +80,11 @@ def generate_final_report(session):
     answers = session["answers"]
     evaluations = session["evaluations"]
     scores = session["scores"]
-    communication_scores = session.get("communication_scores", [])
-
+    # communication_scores = session.get("communication_scores", [])
+    communication_scores = [
+        c for c in session.get("communication_scores",[])
+        if c is not None
+    ]
     skill_scores = calculate_skill_scores(scores)
     overall_score = calculate_overall_score(evaluations)
     if communication_scores:

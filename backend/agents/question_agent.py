@@ -23,12 +23,36 @@ def extract_json(text: str):
 
 
 def generate_next_question(session):
+    # interview_plan = session["interview_plan"]
+    # resume_analysis = session["resume_analysis"]
+    # current_skill_index = session["current_skill_index"]
+    # current_skill = interview_plan.skills_to_test[current_skill_index]
+    # difficulty = session["current_difficulty"]
+    # previous_questions = session["asked_questions"]
+
     interview_plan = session["interview_plan"]
     resume_analysis = session["resume_analysis"]
+    job = session.get("job")
     current_skill_index = session["current_skill_index"]
     current_skill = interview_plan.skills_to_test[current_skill_index]
     difficulty = session["current_difficulty"]
     previous_questions = session["asked_questions"]
+
+    job_context = ""
+    if job is not None:
+        job_context = f"""
+        This question is for a REAL interview for the job below. Prefer connecting the question to the candidate's
+        actual project experience (from Resume Skills/Strengths) while testing the job's required skill.
+
+        Job Title:
+        {job.title}
+
+        Job Description:
+        {job.description}
+
+        Job Required Skills:
+        {job.required_skills}
+        """
 
 #     prompt = f"""
 # You are an expert question generator for technical interviews.
@@ -77,7 +101,7 @@ Target Role:
 
 Candidate Level:
 {interview_plan.candidate_level}
-
+{job_context}
 Resume Skills:
 {resume_analysis.skills}
 

@@ -140,7 +140,7 @@ def normalize_interview_plan_data(data: dict) -> dict:
     return data
 
 
-def create_interview_plan(resume_analysis):
+def create_interview_plan(resume_analysis, job):
 #     prompt = f"""
 # You are an expert interview planner.
 
@@ -179,18 +179,75 @@ def create_interview_plan(resume_analysis):
 # - Do not wrap JSON in ```json.
 # """
 
+#     prompt = f"""
+# You are an expert technical interview planner and hiring evaluator.
+
+# Create a structured interview plan for a candidate based only on the provided resume analysis.
+
+# Your goal is to design an interview plan that tests:
+# - The candidate's strongest claimed skills
+# - The candidate's weaker or unclear areas
+# - Practical readiness for the suggested role
+# - Communication and problem-solving ability
+# - Role-specific technical fundamentals
+
+# Resume Analysis:
+# Skills:
+# {resume_analysis.skills}
+
+# Resume Score:
+# {resume_analysis.score}
+
+# Suggested Job Fit:
+# {resume_analysis.job_fit}
+
+# Strengths:
+# {resume_analysis.strengths}
+
+# Weaknesses:
+# {resume_analysis.weaknesses}
+
+    job_section = ""
+    priority_instruction = "Base the plan primarily on the resume analysis below."
+
+    if job is not None:
+        job_section = f"""
+Job Title:
+{job.title}
+
+Job Description:
+{job.description}
+
+Job Required Skills:
+{job.required_skills}
+
+Job Experience Level:
+{job.experience_level}
+"""
+    priority_instruction = """
+This is a REAL interview for a specific job. The job requirements below are the PRIMARY basis for this plan.
+- "target_role" must come from the Job Title, not from resume job_fit.
+- "skills_to_test" must be built from the Job Required Skills first. Only include resume skills that are NOT in the job's required skills if they are directly relevant.
+- "candidate_level" and "difficulty" must be based on the Job Experience Level compared against the candidate's actual resume experience — not from resume score alone.
+- Use the resume only to judge how well the candidate's real skills, strengths, weaknesses, and past projects match what the job requires, and to identify which of the candidate's specific projects should be probed in the interview.
+- Do not shift focus onto resume skills that are irrelevant to this job.
+"""
+
     prompt = f"""
 You are an expert technical interview planner and hiring evaluator.
 
-Create a structured interview plan for a candidate based only on the provided resume analysis.
+Create a structured interview plan for a candidate.
+
+{priority_instruction}
 
 Your goal is to design an interview plan that tests:
-- The candidate's strongest claimed skills
-- The candidate's weaker or unclear areas
-- Practical readiness for the suggested role
+- The candidate's fit against the job's required skills and experience level
+- The candidate's strongest claimed skills relevant to the job
+- The candidate's weaker or unclear areas relevant to the job
+- Practical readiness for this specific role
 - Communication and problem-solving ability
 - Role-specific technical fundamentals
-
+{job_section}
 Resume Analysis:
 Skills:
 {resume_analysis.skills}
@@ -206,6 +263,7 @@ Strengths:
 
 Weaknesses:
 {resume_analysis.weaknesses}
+
 
 Return ONLY valid JSON.
 Do not include markdown, comments, explanations, or text outside the JSON.

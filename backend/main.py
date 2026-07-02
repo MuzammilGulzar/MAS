@@ -461,13 +461,27 @@ async def start_interview(
         detail="Resume not found. Please complete eligibility first."
     )
 
+    job = db.query(Job).filter(
+        Job.id == application.job_id
+    ).first()
+
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
     analysis_result = ResumeAnalysis.model_validate(
        json.loads(candidate.analysis_json)
-)
+    )
     
+    from types import SimpleNamespace
+    job = SimpleNamespace(
+        title=job.title,
+        description=job.description,
+        required_skills=job.required_skills,
+        experience_level=job.experience_level,
+    )
 
     # -- 4. Create interview plan --
-    interview_plan = create_interview_plan(analysis_result)
+    interview_plan = create_interview_plan(analysis_result, job=job)
   
 
     # -- 5. Create Interview row linked to the EXISTING candidate --
@@ -765,6 +779,45 @@ def get_my_applications(
         })
 
     return result
+
+# ------------------------------------------------------------------
+# CANDIDATE — GET FULL INTERVIEW REPORT FOR AN APPLICATION
+# ------------------------------------------------------------------
+
+@app.get("/report/{application_id}")
+def get_report(
+    application_id: int,
+    db: Session = Depends(get_db),
+    current_user: db_models.User = Depends(get_current_user),
+):
+    candidate = get_candidate_or_404(current_user.id, db)
+
+    application = db.query(Application).filter(
+        Application.id == application_id,
+        Application.candidate_id == candidate.id,
+    ).first()
+
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    if not application.interview_id:
+        raise HTTPException(status_code=404, detail="No interview found for this application")
+
+    report_row = db.query(InterviewReport).filter(
+        InterviewReport.interview_id == application.interview_id
+    ).first()
+
+    if not report_row:
+        raise HTTPException(status_code=404, detail="Report not found yet — interview may still be in progress")
+
+    full_report = json.loads(report_row.report_json) if report_row.report_json else {}
+
+    return {
+        "overall_score": report_row.overall_score,
+        "score_reason": report_row.score_reason,
+        "recommendation": report_row.recommendation,
+        **full_report,
+    }
 
 
 # ------------------------------------------------------------------

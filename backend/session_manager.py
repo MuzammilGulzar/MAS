@@ -1,13 +1,14 @@
 import uuid
 session_store = {}
 
-def create_interview_session(resume_analysis, interview_plan):
+def create_interview_session(resume_analysis, interview_plan, job=None):
     session_id = str(uuid.uuid4())
     session = {
         "session_id": session_id,
         "status": "in_progress",
          "resume_analysis": resume_analysis,
         "interview_plan": interview_plan,
+        "job": job,
         "current_skill_index": 0,
         "current_question_number": 0,
         "asked_questions": [],
@@ -35,9 +36,15 @@ def save_answer_evaluation(session_id, answer, evaluation):
     })
     session["evaluations"].append(evaluation)
     session.setdefault("communication_scores", [])
-    session["communication_scores"].append(
-    session.get("current_communication")
-)
+    
+    # session["communication_scores"].append(
+    # session.get("current_communication")
+    # )
+    # Only record a communication score for voice answers.
+    # Text answers never set current_communication, so skip instead of storing None.
+    current_communication = session.pop("current_communication", None)
+    if current_communication is not None:
+        session["communication_scores"].append(current_communication)
 
     skill = current_question.skill
 

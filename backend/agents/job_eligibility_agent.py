@@ -72,7 +72,7 @@ Rules:
 - Compare skills carefully
 - Compare experience level
 - Compare job fit
-- If score >= 60:
+- If score >= 85:
   eligible = true
 - Else:
   eligible = false
