@@ -9,6 +9,10 @@ class ResumeAnalysis(BaseModel):
     suggestions: List[str]
     job_fit: str
     reason: str
+    ats_feedback: str = ""
+    missing_keywords: List[str] = []
+    improved_summary: str = ""
+    priority_improvements: List[str] = []
 
 # interview planner
 class InterviewPlan(BaseModel):
@@ -18,6 +22,9 @@ class InterviewPlan(BaseModel):
     difficulty: str
     total_questions: int
     evaluation_criteria: List[str]
+    question_distribution: Dict[str, int]  = {} # e.g., {"easy": 2, "medium": 3, "hard": 1}
+    focus_areas: List[str] = []
+    red_flags: List[str] = []
 
 # Questions
 class QuestionObject(BaseModel):
