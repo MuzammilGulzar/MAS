@@ -1,17 +1,57 @@
-<body class="bg-slate-100">
+<!DOCTYPE html>
+<html lang="en">
 
-    <div class="max-w-5xl mx-auto p-8">
-    
-        <h1 class="text-4xl font-bold mb-8">
-            Interview Report
-        </h1>
-    
-        <div id="reportContainer"
-             class="bg-white rounded-xl shadow p-8">
+<head>
+    <!-- Auth guard: runs before page content, redirects if unauthorized -->
+    <script src="../../src/js/auth_guard.js" type="module"></script>
+    <script type="module">
+        import { requireCandidate } from "../../src/js/auth_guard.js";
+        requireCandidate();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 antialiased text-slate-900">
+
+    <div class="max-w-5xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">
+                Interview Performance Report
+            </h1>
+            <p class="text-slate-500 text-lg">Detailed analysis of your recent AI interview session</p>
         </div>
-    
+
+        <div id="reportContainer"
+            class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 sm:p-12 overflow-hidden">
+            <!-- Report contents loaded via JS -->
+            <div class="text-center text-slate-500 py-10">
+                Generating report...
+            </div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <button onclick="window.history.back()" class="text-indigo-600 font-medium hover:text-indigo-800">
+                ← Go Back
+            </button>
+        </div>
+
     </div>
-    
+
+    <div id="footer"></div>
+
     <script src="../../src/js/report.js"></script>
-    
-    </body>
+
+</body>
+
+</html>

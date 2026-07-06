@@ -4,80 +4,126 @@
 <head>
     <script src="../../src/js/auth_guard.js" type="module"></script>
     <script type="module">
-        import { requireHR } from "../../src/js/auth_quard.js";
+        import { requireHR } from "../../src/js/auth_guard.js";
         requireHR();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HR Dashboard - MAS</title>
-    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-slate-50 min-h-screen text-slate-900 antialiased">
 
     <div id="navbar"></div>
 
-    <div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-gray-900">HR Dashboard</h1>
-            <p class="text-gray-500 mt-1">Overview of your recruitment activity</p>
+        <div class="mb-10">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Recruitment Dashboard</h1>
+            <p class="text-slate-500 mt-2">Overview of your jobs, candidates, and AI interview metrics.</p>
         </div>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-                <div id="statJobs" class="text-3xl font-bold text-blue-600">—</div>
-                <div class="text-sm text-gray-500 mt-1">Open Jobs</div>
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
+            <div
+                class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 bg-indigo-50 w-20 h-20 rounded-full opacity-50"></div>
+                <div class="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider relative z-10">Open Jobs
+                </div>
+                <div id="statJobs" class="text-4xl font-extrabold text-indigo-600 relative z-10">—</div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-                <div id="statApps" class="text-3xl font-bold text-purple-600">—</div>
-                <div class="text-sm text-gray-500 mt-1">Applications</div>
+            <div
+                class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 bg-purple-50 w-20 h-20 rounded-full opacity-50"></div>
+                <div class="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider relative z-10">Total Apps
+                </div>
+                <div id="statApps" class="text-4xl font-extrabold text-purple-600 relative z-10">—</div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-                <div id="statInterviews" class="text-3xl font-bold text-green-600">—</div>
-                <div class="text-sm text-gray-500 mt-1">Interviews Done</div>
+            <div
+                class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 bg-emerald-50 w-20 h-20 rounded-full opacity-50"></div>
+                <div class="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider relative z-10">Interviews
+                </div>
+                <div id="statInterviews" class="text-4xl font-extrabold text-emerald-600 relative z-10">—</div>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 text-center">
-                <div id="statShortlisted" class="text-3xl font-bold text-orange-600">—</div>
-                <div class="text-sm text-gray-500 mt-1">Shortlisted</div>
+            <div
+                class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col justify-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 bg-amber-50 w-20 h-20 rounded-full opacity-50"></div>
+                <div class="text-sm font-semibold text-slate-500 mb-1 uppercase tracking-wider relative z-10">
+                    Shortlisted</div>
+                <div id="statShortlisted" class="text-4xl font-extrabold text-amber-500 relative z-10">—</div>
             </div>
         </div>
 
         <!-- Quick actions -->
-        <div class="grid md:grid-cols-2 gap-4 mb-10">
+        <div class="grid md:grid-cols-2 gap-6 mb-10">
             <a href="create_job.html"
-                class="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-2xl transition flex items-center gap-4">
-                <span class="text-3xl">➕</span>
+                class="group bg-indigo-600 hover:bg-indigo-700 shadow-md hover:shadow-lg focus:ring-4 focus:ring-indigo-500/20 text-white p-6 sm:p-8 rounded-2xl transition-all flex items-center gap-5 border border-indigo-500">
+                <div class="bg-white/20 p-4 rounded-xl group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </div>
                 <div>
-                    <div class="font-bold">Post New Job</div>
-                    <div class="text-blue-200 text-sm">Create a job listing</div>
+                    <div class="text-xl font-bold mb-1">Post a New Job</div>
+                    <div class="text-indigo-200 text-sm font-medium">Create a listing and let AI screen candidates</div>
                 </div>
             </a>
             <a href="applications.html"
-                class="bg-white hover:bg-gray-50 border border-gray-200 p-6 rounded-2xl transition flex items-center gap-4">
-                <span class="text-3xl">👥</span>
+                class="group bg-white hover:bg-slate-50 shadow-sm hover:shadow-md border border-slate-200 p-6 sm:p-8 rounded-2xl transition-all flex items-center gap-5">
+                <div class="bg-slate-100 p-4 rounded-xl text-slate-600 group-hover:bg-slate-200 transition-colors">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                        </path>
+                    </svg>
+                </div>
                 <div>
-                    <div class="font-bold text-gray-900">View Applications</div>
-                    <div class="text-gray-500 text-sm">Review all candidates</div>
+                    <div class="text-xl font-bold text-slate-900 mb-1">View Applications</div>
+                    <div class="text-slate-500 text-sm font-medium">Review candidates and make hiring decisions</div>
                 </div>
             </a>
         </div>
 
         <!-- Your Jobs list -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Your Job Listings</h2>
-                <a href="create_job.html" class="text-blue-600 hover:underline text-sm font-medium">+ Post Job</a>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="flex items-center justify-between mb-8 border-b border-slate-100 pb-4">
+                <h2 class="text-xl font-bold text-slate-900">Your Active Job Listings</h2>
+                <a href="create_job.html"
+                    class="text-indigo-600 hover:text-indigo-800 text-sm font-bold flex items-center gap-1 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Post Job
+                </a>
             </div>
 
-            <div id="jobsLoading" class="text-center py-6">
-                <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+            <div id="jobsLoading" class="text-center py-12">
+                <div
+                    class="w-8 h-8 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4">
+                </div>
+                <p class="text-slate-500 font-medium">Loading jobs...</p>
             </div>
-            <div id="jobsEmpty" class="hidden text-center py-6 text-gray-400">No jobs posted yet.</div>
-            <div id="jobsList" class="space-y-3"></div>
+
+            <div id="jobsEmpty"
+                class="hidden text-center py-12 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                <p class="text-slate-500 font-medium">No jobs posted yet. Create your first listing to get started.</p>
+            </div>
+
+            <div id="jobsList" class="space-y-4"></div>
         </div>
     </div>
+
+    <div id="footer"></div>
 
     <script>
         const token = localStorage.getItem("access_token")
@@ -85,7 +131,7 @@
 
         async function loadStats() {
             try {
-                const res = await fetch("http://127.0.0.1:8000/hr/stats", { headers: AUTH })  // ← FIXED
+                const res = await fetch("http://127.0.0.1:8000/hr/stats", { headers: AUTH })
                 const data = await res.json()
                 document.getElementById("statJobs").textContent = data.total_jobs
                 document.getElementById("statApps").textContent = data.total_applications
@@ -96,7 +142,7 @@
 
         async function loadJobs() {
             try {
-                const res = await fetch("http://127.0.0.1:8000/hr/jobs", { headers: AUTH })  // ← FIXED
+                const res = await fetch("http://127.0.0.1:8000/hr/jobs", { headers: AUTH })
                 const jobs = await res.json()
 
                 document.getElementById("jobsLoading").classList.add("hidden")
@@ -111,23 +157,28 @@
 
                 jobs.forEach(job => {
                     const isActive = (job.status || "active") === "active"
-                    const statusColor = isActive ? "green" : "gray"
+                    const statusColor = isActive ? "emerald" : "slate"
+
                     list.innerHTML += `
-                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-0">
-                    <div>
-                        <h3 class="font-semibold text-gray-900">${job.title}</h3>
-                        <p class="text-sm text-gray-500">${job.experience_level}</p>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between p-5 rounded-xl border border-slate-100 bg-slate-50/50 hover:bg-slate-50 transition-colors group">
+                    <div class="mb-4 sm:mb-0">
+                        <div class="flex items-center gap-3 mb-1">
+                            <h3 class="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors text-xl">${job.title}</h3>
+                            <span class="bg-${statusColor}-100 text-${statusColor}-700 ring-1 ring-inset ring-${statusColor}-600/20 text-xs px-2 py-0.5 rounded-full font-semibold capitalize tracking-wide">
+                                ${job.status || "active"}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-4 text-m text-slate-500">
+                            <span class="flex items-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>${job.experience_level}</span>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <span class="bg-${statusColor}-100 text-${statusColor}-700 text-xs px-2.5 py-1 rounded-full font-medium">
-                            ${job.status || "active"}
-                        </span>
                         <button onclick="toggleStatus(${job.id}, '${job.status || 'active'}')"
-                            class="text-xs text-gray-500 hover:text-gray-800 border border-gray-300 px-3 py-1 rounded-lg transition">
-                            ${isActive ? "Close" : "Reopen"}
+                            class="text-m font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-300 hover:border-slate-400 px-4 py-2 rounded-lg transition-all shadow-sm">
+                            ${isActive ? "Close Job" : "Reopen Job"}
                         </button>
                         <button onclick="deleteJob(${job.id})"
-                            class="text-xs text-red-500 hover:text-red-700 border border-red-200 px-3 py-1 rounded-lg transition">
+                            class="text-m font-semibold text-rose-600 hover:text-rose-700 bg-white border border-rose-200 hover:border-rose-300 hover:bg-rose-50 px-4 py-2 rounded-lg transition-all shadow-sm">
                             Delete
                         </button>
                     </div>
@@ -135,7 +186,7 @@
                 })
             } catch (e) {
                 document.getElementById("jobsLoading").innerHTML =
-                    `<p class="text-red-500 text-center text-sm">Failed to load jobs</p>`
+                    `<p class="text-rose-500 font-medium text-center text-sm">Failed to load jobs. Please check connection.</p>`
             }
         }
 
@@ -144,7 +195,7 @@
             try {
                 const res = await fetch(`http://127.0.0.1:8000/hr/jobs/${jobId}/status`, {
                     method: "PATCH",
-                    headers: { ...AUTH, "Content-Type": "application/json" },  // ← FIXED
+                    headers: { ...AUTH, "Content-Type": "application/json" },
                     body: JSON.stringify({ status: newStatus })
                 })
                 if (!res.ok) { alert("Failed to update status"); return }
@@ -154,11 +205,11 @@
         }
 
         async function deleteJob(jobId) {
-            if (!confirm("Delete this job? This cannot be undone.")) return
+            if (!confirm("Are you sure you want to delete this job? This action cannot be undone.")) return
             try {
                 const res = await fetch(`http://127.0.0.1:8000/hr/jobs/${jobId}`, {
                     method: "DELETE",
-                    headers: AUTH   // ← FIXED
+                    headers: AUTH
                 })
                 if (!res.ok) { alert("Failed to delete job"); return }
                 loadJobs()
@@ -169,10 +220,15 @@
         const _ns = document.createElement("script")
         _ns.src = "../../src/js/navbar.js"
         _ns.onload = () => loadNavbar("../../components/navbar.html")
+
         document.head.appendChild(_ns)
 
         loadStats()
         loadJobs()
+    </script>
+     <script src="../../src/js/footer.js"></script>
+    <script>
+        loadFooter("../../components/footer.html");
     </script>
 </body>
 

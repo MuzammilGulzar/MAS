@@ -4,76 +4,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+    <title>Job Portal - Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 
-<body>
-    <section>
-        
-        <!-- ../components/navbar.html -->
-        <div id="header" class="header"></div>
+<body class="bg-slate-50 antialiased text-slate-900">
+    
+    <!-- Navbar Container -->
+    <div id="header" class="header"></div>
+
+    <!-- Hero Section -->
+    <section class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-24 text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+                Find Your Next Great Opportunity
+            </h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
+                Discover roles that match your skills and apply in just a few clicks. Join thousands of professionals advancing their careers with MAS.
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="../../pages/candidate/jobs.html" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium shadow-sm hover:bg-indigo-700 transition-all focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Browse Jobs
+                </a>
+            </div>
+        </div>
     </section>
 
-    <section>
-        <div class="jobs-section p-3 bg-amber-400">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Job Card 1 -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-lg font-semibold text-gray-800">Backend Engineer</h2>
-                    <p class="text-gray-600 mt-2">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nihil
-                        similique, laudantium inventore voluptatem quibusdam illo alias reiciendis reprehenderit est
-                        consequuntur voluptate. Sed nam labore, mollitia ipsam alias eius ex quidem.</p>
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="text-sm text-gray-500">Location: New York</span>
-                        <a href="#" class="bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-500">
-                            Apply
-                        </a>
-                    </div>
-                </div>
+    <!-- Featured Jobs Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl font-bold text-slate-900">Featured Opportunities</h2>
+            <a href="jobs.html" class="text-indigo-600 font-medium hover:text-indigo-700 flex items-center gap-1">
+                View all <span aria-hidden="true">&rarr;</span>
+            </a>
+        </div>
 
-                <!-- Job Card 2 -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-lg font-semibold text-gray-800">UI/UX Designer</h2>
-                    <p class="text-gray-600 mt-2">Creative designer with Figma and prototyping skills.</p>
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="text-sm text-gray-500">Location: Remote</span>
-                        <a href="#" class="bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-500">
-                            Apply
-                        </a>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Job Card 1 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow flex flex-col h-full">
+                <div class="flex-grow">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10">Engineering</span>
+                        <span class="text-sm text-slate-500">2d ago</span>
                     </div>
+                    <h3 class="text-lg font-bold text-slate-900">Backend Engineer</h3>
+                    <p class="text-slate-600 mt-2 text-sm line-clamp-3">Design, build, and maintain high-performance, reusable, and reliable server-side code. Experience with Python, Node.js, or Go preferred.</p>
                 </div>
+                <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                    <div class="flex items-center gap-1.5 text-sm text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        New York
+                    </div>
+                    <a href="#" class="text-indigo-600 font-medium text-sm hover:text-indigo-800 transition-colors">Apply Now</a>
+                </div>
+            </div>
 
-                <!-- Job Card 3 -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-lg font-semibold text-gray-800">Data Analyst</h2>
-                    <p class="text-gray-600 mt-2">Strong SQL and visualization skills required.</p>
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="text-sm text-gray-500">Location: London</span>
-                        <a href="#" class="bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-500">
-                            Apply
-                        </a>
+            <!-- Job Card 2 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow flex flex-col h-full">
+                <div class="flex-grow">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center rounded-full bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10">Design</span>
+                        <span class="text-sm text-slate-500">3d ago</span>
                     </div>
+                    <h3 class="text-lg font-bold text-slate-900">UI/UX Designer</h3>
+                    <p class="text-slate-600 mt-2 text-sm line-clamp-3">Creative designer needed with strong Figma prototyping skills to build intuitive, accessible user interfaces.</p>
                 </div>
-                
-                <!-- Job Card 4 -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-lg font-semibold text-gray-800">Data Analyst</h2>
-                    <p class="text-gray-600 mt-2">Strong SQL and visualization skills required.</p>
-                    <div class="mt-4 flex items-center justify-between">
-                        <span class="text-sm text-gray-500">Location: London</span>
-                        <a href="#" class="bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-500">
-                            Apply
-                        </a>
+                <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                    <div class="flex items-center gap-1.5 text-sm text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        Remote
                     </div>
+                    <a href="#" class="text-indigo-600 font-medium text-sm hover:text-indigo-800 transition-colors">Apply Now</a>
+                </div>
+            </div>
+
+            <!-- Job Card 3 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-shadow flex flex-col h-full">
+                <div class="flex-grow">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-inset ring-emerald-700/10">Data</span>
+                        <span class="text-sm text-slate-500">5d ago</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Data Analyst</h3>
+                    <p class="text-slate-600 mt-2 text-sm line-clamp-3">Seeking an analyst with strong SQL and visualization skills (Tableau, PowerBI) to transform complex data into actionable insights.</p>
+                </div>
+                <div class="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+                    <div class="flex items-center gap-1.5 text-sm text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        London
+                    </div>
+                    <a href="#" class="text-indigo-600 font-medium text-sm hover:text-indigo-800 transition-colors">Apply Now</a>
                 </div>
             </div>
         </div>
-
     </section>
-    <!-- get footer -->
 
+    <!-- Footer Area -->
+    <footer class="bg-white border-t border-slate-200 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex items-center justify-between">
+            <p class="text-slate-500 text-sm">© 2026 MAS Inc. All rights reserved.</p>
+        </div>
+    </footer>
+    <div id="footer"></div>
+    <script src="../../src/js/footer.js"></script>
     <script src="../../src/js/app.js"></script>
+    <script>
+        loadFooter("../../components/footer.html");
+    </script>
 </body>
 
 </html>

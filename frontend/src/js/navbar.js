@@ -16,15 +16,19 @@ function initNavbar() {
         if (role === "hr") {
             document.getElementById("hrNav").style.display        = "flex";
             document.getElementById("navLogo").href = "/frontend/pages/hr/hr_dashboard.html";
-        } else {
+        } else if (role === "candidate") {
             document.getElementById("candidateNav").style.display = "flex";
-            document.getElementById("navLogo").href = "/frontend/pages/candidate/jobs.html";
+            document.getElementById("navLogo").href = "/frontend/pages/candidate/candidate_dashboard.html";
+        }else{
+            // If role is not recognized, hide all role-specific nav items
+            document.getElementById("hrNav").style.display        = "none";
+            document.getElementById("candidateNav").style.display = "none";
         }
     }
 
     document.getElementById("logoutBtn").addEventListener("click", function () {
         localStorage.clear();
-        window.location.href = "/frontend/components/login.html";
+        window.location.href = "/frontend/pages/shared/index.html";
     });
 }
 

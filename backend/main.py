@@ -994,6 +994,71 @@ def get_hr_stats(
 # ------------------------------------------------------------------
 # HR — ALL APPLICATIONS ACROSS ALL MY JOBS (for applications.html)
 # ------------------------------------------------------------------
+
+@app.get("/hr/application/{application_id}")
+def get_single_application(
+    application_id: int,
+    db: Session = Depends(get_db),
+    current_user: db_models.User = Depends(get_current_user),
+):
+    """HR only — get full details of a single application by ID."""
+    if current_user.role.lower() != "hr":
+        raise HTTPException(status_code=403, detail="HR access required")
+
+    app = db.query(Application).filter(Application.id == application_id).first()
+    if not app:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    candidate = db.query(Candidate).filter(Candidate.id == app.candidate_id).first()
+    user = db.query(db_models.User).filter(
+        db_models.User.id == candidate.user_id
+    ).first() if candidate else None
+    job = db.query(Job).filter(Job.id == app.job_id).first()
+
+    report = None
+    if app.interview_id:
+        report_row = db.query(InterviewReport).filter(
+            InterviewReport.interview_id == app.interview_id
+        ).first()
+        if report_row and report_row.report_json:
+            try:
+                parsed = json.loads(report_row.report_json)
+                report = {
+                    "overall_score": report_row.overall_score,
+                    "score_reason": report_row.score_reason,
+                    "recommendation": report_row.recommendation,
+                    **parsed,
+                }
+            except (json.JSONDecodeError, TypeError):
+                report = {
+                    "overall_score": report_row.overall_score,
+                    "score_reason": report_row.score_reason,
+                    "recommendation": report_row.recommendation,
+                }
+
+    return {
+        "application_id": app.id,
+        "status": app.status,
+        "eligibility_status": app.eligibility_status,
+        "eligibility_reason": app.eligibility_reason,
+        "applied_at": app.applied_at,
+        "candidate": {
+            "id": candidate.id if candidate else None,
+            "name": user.username if user else "Unknown",
+            "email": user.email if user else "Unknown",
+            "resume_score": candidate.resume_score if candidate else None,
+            "candidate_level": candidate.candidate_level if candidate else None,
+            "job_fit": candidate.job_fit if candidate else None,
+            "resume_score_reason": candidate.resume_score_reason if candidate else None,
+        },
+        "job": {
+            "id": job.id if job else None,
+            "title": job.title if job else "Unknown",
+            "experience_level": job.experience_level if job else None,
+            "description": job.description if job else None,
+        },
+        "report": report,
+    }
  
 @app.get("/hr/applications")
 def get_all_hr_applications(

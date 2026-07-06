@@ -78,7 +78,7 @@ document
         if (payload.role === "hr") {
             window.location.href = "/frontend/pages/hr/hr_dashboard.html";
         } else {
-            window.location.href = "/frontend/pages/candidate/jobs.html";
+            window.location.href = "/frontend/pages/candidate/candidate_dashboard.html";
         }
 
     } catch (error) {

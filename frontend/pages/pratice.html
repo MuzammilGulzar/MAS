@@ -5,88 +5,139 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Practice Interview - MAS</title>
-    <link rel="stylesheet" href="../dist/css/tailwind.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        #chatBox::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #chatBox::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chatBox::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen text-slate-900 antialiased">
 
+    <section>
+        <div id="navbar" class="header"></div>
+    </section>
     <!-- Hero -->
-    <section class="bg-gradient-to-r from-purple-600 to-indigo-700">
-        <div class="max-w-5xl mx-auto px-6 py-14 text-center">
-            <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/20 text-white text-sm mb-4">
-                🎯 Practice Mode — No account needed
+    <section class="bg-purple-700 relative overflow-hidden">
+        <div
+            class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNykiLz48L3N2Zz4=')] [mask-image:linear-gradient(to_bottom,white,transparent)]">
+        </div>
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-16 sm:py-20 text-center relative z-10">
+            <div
+                class="inline-flex items-center px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-purple-100 text-sm font-semibold mb-6 backdrop-blur-sm shadow-sm">
+                🎯 Practice Mode
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">
-                Practice Interview
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight">
+                Master Your Interview Skills
             </h1>
-            <p class="text-purple-100 text-lg max-w-xl mx-auto">
-                Upload your resume, get AI-generated questions tailored to your skills, and practise answering them with
+            <p class="text-purple-100/90 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed">
+                Upload your resume, get AI-generated questions tailored to your background, and practice answering with
                 instant feedback.
             </p>
         </div>
     </section>
 
-    <div class="max-w-4xl mx-auto px-6 -mt-8 pb-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 -mt-10 sm:-mt-12 relative z-20 pb-20">
 
         <!-- Upload Card -->
-        <div id="uploadCard" class="bg-white rounded-3xl shadow-xl p-8 mb-6">
-            <h2 class="text-xl font-bold text-slate-800 mb-1">Upload Your Resume</h2>
-            <p class="text-slate-500 text-sm mb-5">PDF or DOCX • Max 10MB</p>
+        <div id="uploadCard"
+            class="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 sm:p-10 mb-8 text-center">
+            <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Upload Your Resume</h2>
+            <p class="text-slate-500 text-sm font-medium mb-8">PDF or DOCX • Max 10MB</p>
 
             <label
-                class="block border-2 border-dashed border-slate-200 hover:border-purple-400 rounded-2xl p-10 text-center transition cursor-pointer"
+                class="block border-2 border-dashed border-slate-300 hover:border-purple-500 bg-slate-50 hover:bg-purple-50 rounded-2xl p-12 transition-all cursor-pointer group"
                 id="dropZone">
                 <input type="file" id="resumeFile" accept=".pdf,.docx" class="hidden">
-                <div class="text-4xl mb-3">📄</div>
-                <p class="font-semibold text-slate-700" id="fileLabel">Click to upload resume</p>
-                <p class="text-sm text-slate-400 mt-1">Drag & drop also works</p>
+                <div
+                    class="w-16 h-16 bg-white rounded-xl shadow-sm border border-slate-200 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8 text-slate-400 group-hover:text-purple-500 transition-colors" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                        </path>
+                    </svg>
+                </div>
+                <p class="font-bold text-slate-700 text-lg mb-1" id="fileLabel">Click to browse files</p>
+                <p class="text-sm text-slate-500 font-medium">Drag & drop is also supported</p>
             </label>
 
             <button onclick="startPractice()" id="startBtn"
-                class="mt-5 w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-xl font-semibold text-lg transition shadow-md">
-                Start Practice Interview →
+                class="mt-8 w-full sm:w-auto mx-auto bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-500/20 text-white px-10 py-4 rounded-xl font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                Start Practice Interview
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                    </path>
+                </svg>
             </button>
         </div>
 
         <!-- Loading -->
-        <div id="loading" class="hidden bg-white rounded-3xl shadow-lg p-10 text-center mb-6">
-            <div
-                class="w-14 h-14 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4">
+        <div id="loading" class="hidden bg-white rounded-2xl shadow-xl border border-slate-100 p-12 text-center mb-8">
+            <div class="w-14 h-14 border-4 border-slate-100 border-t-purple-600 rounded-full animate-spin mx-auto mb-6">
             </div>
-            <h3 class="text-xl font-semibold text-slate-800">Preparing your practice interview</h3>
-            <p class="text-slate-400 mt-2 text-sm">Analysing resume and generating questions…</p>
+            <h3 class="text-xl font-bold text-slate-900 tracking-tight mb-2">Preparing your practice session...</h3>
+            <p class="text-slate-500 font-medium">Analyzing resume and generating questions tailored to your skills.</p>
         </div>
 
         <!-- Resume Summary -->
-        <div id="summary" class="hidden bg-white rounded-2xl shadow p-6 mb-6"></div>
+        <div id="summary" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6"></div>
 
         <!-- Progress bar -->
-        <div id="progressBar" class="hidden bg-white rounded-2xl shadow p-4 mb-4">
-            <div class="flex justify-between text-sm text-slate-500 mb-2">
-                <span id="progressLabel">Question 1</span>
-                <span id="skillLabel"></span>
+        <div id="progressBar" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+            <div class="flex justify-between text-sm font-bold text-slate-700 mb-3">
+                <span id="progressLabel" class="uppercase tracking-wider">Question 1</span>
+                <span id="skillLabel" class="text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md"></span>
             </div>
-            <div class="bg-slate-100 rounded-full h-2">
-                <div id="progressFill" class="bg-purple-500 h-2 rounded-full transition-all duration-500"
+            <div class="bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                <div id="progressFill" class="bg-purple-500 h-2.5 rounded-full transition-all duration-700 ease-out"
                     style="width:0%"></div>
             </div>
         </div>
 
         <!-- Chat -->
-        <div id="chatSection" class="hidden bg-white rounded-3xl shadow-xl overflow-hidden mb-6">
-            <div class="border-b px-6 py-4 bg-slate-50 flex items-center justify-between">
-                <h2 class="text-lg font-bold text-slate-800">Interview Session</h2>
+        <div id="chatSection"
+            class="hidden bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden mb-8 flex flex-col h-[650px]">
+            <div class="border-b border-slate-100 px-6 py-4 bg-slate-50 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center shadow-inner">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-900">Practice Coach</h2>
+                </div>
                 <span id="difficultyBadge"
-                    class="text-xs px-3 py-1 rounded-full font-medium bg-purple-100 text-purple-700"></span>
+                    class="text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider bg-purple-100 text-purple-700"></span>
             </div>
-            <div id="chatBox" class="h-[450px] overflow-y-auto p-6 space-y-4 bg-slate-50"></div>
-            <div class="border-t p-4 bg-white">
-                <div class="flex gap-3">
-                    <input type="text" id="answerInput" placeholder="Type your answer here…"
-                        class="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400"
+
+            <div id="chatBox" class="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50 scroll-smooth"></div>
+
+            <div class="border-t border-slate-100 p-4 sm:p-5 bg-white shrink-0">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="answerInput" placeholder="Type your answer here..."
+                        class="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all placeholder:text-slate-400"
                         onkeydown="if(event.key==='Enter') submitAnswer()">
                     <button onclick="submitAnswer()" id="sendBtn"
-                        class="bg-purple-600 hover:bg-purple-700 text-white px-7 rounded-xl font-semibold transition">
+                        class="bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-500/20 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-sm shrink-0">
                         Send
                     </button>
                 </div>
@@ -94,10 +145,13 @@
         </div>
 
         <!-- Final Report -->
-        <div id="finalReport" class="hidden bg-white rounded-3xl shadow-xl p-8"></div>
+        <div id="finalReport" class="hidden bg-white rounded-2xl shadow-xl border border-slate-200 p-8"></div>
 
     </div>
 
+    <section>
+        <div id="footer"></div>
+    </section>
     <script>
         const API = "http://127.0.0.1:8000"
         let sessionId = null
@@ -108,15 +162,15 @@
         const fileLabel = document.getElementById("fileLabel")
 
         fileInput.addEventListener("change", () => {
-            if (fileInput.files[0]) fileLabel.textContent = "📎 " + fileInput.files[0].name
+            if (fileInput.files[0]) fileLabel.innerHTML = `<span class="text-purple-600">Selected:</span> ${fileInput.files[0].name}`
         })
-        dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("border-purple-500") })
-        dropZone.addEventListener("dragleave", () => dropZone.classList.remove("border-purple-500"))
+        dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("border-purple-500", "bg-purple-50") })
+        dropZone.addEventListener("dragleave", () => dropZone.classList.remove("border-purple-500", "bg-purple-50"))
         dropZone.addEventListener("drop", e => {
             e.preventDefault()
-            dropZone.classList.remove("border-purple-500")
+            dropZone.classList.remove("border-purple-500", "bg-purple-50")
             fileInput.files = e.dataTransfer.files
-            if (fileInput.files[0]) fileLabel.textContent = "📎 " + fileInput.files[0].name
+            if (fileInput.files[0]) fileLabel.innerHTML = `<span class="text-purple-600">Selected:</span> ${fileInput.files[0].name}`
         })
 
         // ── Helpers ────────────────────────────────────────────────────
@@ -127,11 +181,11 @@
             const box = document.getElementById("chatBox")
             const div = document.createElement("div")
             if (type === "ai") {
-                div.className = "bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 text-sm text-slate-800 shadow-sm max-w-[85%]"
+                div.className = "bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-5 text-sm text-slate-800 shadow-sm max-w-[85%] leading-relaxed"
             } else if (type === "user") {
-                div.className = "bg-purple-600 text-white rounded-2xl rounded-tr-sm p-4 text-sm ml-auto max-w-[85%]"
+                div.className = "bg-purple-600 text-white rounded-2xl rounded-tr-sm p-5 text-sm ml-auto max-w-[85%] shadow-sm leading-relaxed"
             } else {
-                div.className = "bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm w-full"
+                div.className = "bg-slate-50 border border-slate-200 rounded-2xl p-5 text-sm w-full leading-relaxed shadow-sm"
             }
             div.innerHTML = html
             box.appendChild(div)
@@ -142,10 +196,10 @@
             const box = document.getElementById("chatBox")
             const div = document.createElement("div")
             div.id = "typing"
-            div.className = "flex gap-1 items-center bg-white border border-slate-200 rounded-2xl p-4 w-16"
-            div.innerHTML = `<span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay:0s"></span>
-                     <span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay:.15s"></span>
-                     <span class="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style="animation-delay:.3s"></span>`
+            div.className = "flex gap-1.5 items-center bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-5 w-20 shadow-sm"
+            div.innerHTML = `<span class="w-2.5 h-2.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:0s"></span>
+                     <span class="w-2.5 h-2.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:.15s"></span>
+                     <span class="w-2.5 h-2.5 bg-slate-400 rounded-full animate-bounce" style="animation-delay:.3s"></span>`
             box.appendChild(div)
             box.scrollTop = box.scrollHeight
         }
@@ -155,23 +209,23 @@
             const pct = Math.round(((current - 1) / total) * 100)
             document.getElementById("progressFill").style.width = pct + "%"
             document.getElementById("progressLabel").textContent = `Question ${current} of ${total}`
-            document.getElementById("skillLabel").textContent = skill ? `Skill: ${skill}` : ""
+            document.getElementById("skillLabel").textContent = skill ? `Skill Focus: ${skill}` : ""
             document.getElementById("difficultyBadge").textContent = difficulty || ""
         }
 
         function showResumeSummary(r, plan) {
-            const scoreColor = r.score >= 75 ? "text-green-600" : r.score >= 50 ? "text-yellow-600" : "text-red-500"
+            const scoreColor = r.score >= 75 ? "text-emerald-600" : r.score >= 50 ? "text-amber-500" : "text-rose-500"
             document.getElementById("summary").innerHTML = `
-        <div class="flex items-center gap-5 flex-wrap">
-            <div class="text-center">
-                <div class="text-3xl font-bold ${scoreColor}">${r.score}</div>
-                <div class="text-xs text-slate-400">Resume Score</div>
+        <div class="flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
+            <div class="text-center sm:border-r border-slate-200 sm:pr-8">
+                <div class="text-4xl font-extrabold ${scoreColor}">${r.score}</div>
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Resume Score</div>
             </div>
-            <div>
-                <div class="font-semibold text-slate-800">${r.job_fit}</div>
-                <div class="text-sm text-slate-500">${plan.candidate_level} · ${plan.difficulty} difficulty · ${plan.total_questions} questions</div>
-                <div class="mt-2 flex flex-wrap gap-1">
-                    ${(plan.skills_to_test || []).map(s => `<span class="bg-purple-100 text-purple-700 text-xs px-2 py-0.5 rounded-full">${s}</span>`).join("")}
+            <div class="text-center sm:text-left flex-1">
+                <div class="font-bold text-slate-900 text-lg mb-1">${r.job_fit}</div>
+                <div class="text-sm font-medium text-slate-500 mb-3">${plan.candidate_level} Level · <span class="capitalize text-slate-700">${plan.difficulty}</span> difficulty · ${plan.total_questions} questions</div>
+                <div class="flex flex-wrap justify-center sm:justify-start gap-2">
+                    ${(plan.skills_to_test || []).map(s => `<span class="bg-purple-50 border border-purple-100 text-purple-700 text-xs font-semibold px-2.5 py-1 rounded-md tracking-wide">${s}</span>`).join("")}
                 </div>
             </div>
         </div>`
@@ -179,79 +233,106 @@
         }
 
         function showEvaluation(ev) {
-            const color = ev.score >= 7 ? "#16a34a" : ev.score >= 5 ? "#d97706" : "#dc2626"
-            const covered = (ev.covered_points || []).map(p => `<li>✓ ${p}</li>`).join("")
-            const missing = (ev.missing_points || []).map(p => `<li>△ ${p}</li>`).join("")
+            const colorClass = ev.score >= 7 ? "text-emerald-600" : ev.score >= 5 ? "text-amber-600" : "text-rose-600"
+            const bgClass = ev.score >= 7 ? "bg-emerald-50 border-emerald-100" : ev.score >= 5 ? "bg-amber-50 border-amber-100" : "bg-rose-50 border-rose-100"
+
+            const covered = (ev.covered_points || []).map(p => `<li class="flex items-start gap-2 text-emerald-700"><svg class="w-4 h-4 mt-0.5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> ${p}</li>`).join("")
+            const missing = (ev.missing_points || []).map(p => `<li class="flex items-start gap-2 text-amber-700"><svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> ${p}</li>`).join("")
+
             addMsg("eval", `
-        <div class="font-semibold mb-1" style="color:${color}">Score: ${ev.score}/10</div>
-        <p class="text-slate-600 text-sm">${ev.feedback}</p>
+        <div class="flex items-center gap-2 font-bold mb-3 ${colorClass} uppercase tracking-wider text-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Score: ${ev.score}/10
+        </div>
+        <p class="text-slate-700 text-sm font-medium leading-relaxed mb-4">${ev.feedback}</p>
         ${covered || missing ? `
-        <details class="mt-2 text-xs text-slate-500 cursor-pointer">
-            <summary>See detailed feedback</summary>
-            <ul class="mt-2 space-y-1 text-green-700">${covered}</ul>
-            <ul class="mt-1 space-y-1 text-orange-700">${missing}</ul>
+        <details class="text-sm bg-white/60 p-4 rounded-xl border border-white/50 cursor-pointer group">
+            <summary class="font-bold text-slate-600 outline-none flex items-center gap-2 group-hover:text-slate-900 transition-colors">
+                <svg class="w-4 h-4 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                Detailed Breakdown
+            </summary>
+            <div class="mt-4 space-y-4 pt-4 border-t border-slate-200">
+                ${covered ? `<div><h4 class="font-bold text-emerald-800 text-xs uppercase tracking-wider mb-2">Covered Points</h4><ul class="space-y-1.5">${covered}</ul></div>` : ""}
+                ${missing ? `<div><h4 class="font-bold text-amber-800 text-xs uppercase tracking-wider mb-2">Missed Opportunities</h4><ul class="space-y-1.5">${missing}</ul></div>` : ""}
+            </div>
         </details>` : ""}`)
         }
 
         function showFinalReport(r) {
-            const recColor = r.recommendation === "Shortlist" ? "bg-green-100 text-green-700"
-                : r.recommendation === "Reject" ? "bg-red-100 text-red-700"
-                    : "bg-yellow-100 text-yellow-700"
+            const recColor = r.recommendation === "Shortlist" ? "bg-emerald-100 text-emerald-700 ring-emerald-600/20"
+                : r.recommendation === "Reject" ? "bg-rose-100 text-rose-700 ring-rose-600/20"
+                    : "bg-amber-100 text-amber-700 ring-amber-600/20"
 
             document.getElementById("finalReport").innerHTML = `
-        <h2 class="text-2xl font-bold text-slate-800 mb-6">Practice Report</h2>
-        <div class="flex items-center gap-6 mb-6 flex-wrap">
-            <div class="text-center">
-                <div class="text-4xl font-bold ${r.overall_score >= 7 ? 'text-green-600' : r.overall_score >= 5 ? 'text-yellow-600' : 'text-red-500'}">${r.overall_score}/10</div>
-                <div class="text-xs text-slate-400 mt-1">Overall Score</div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-6 mb-8 gap-4">
+            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Practice Report</h2>
+            <div class="flex items-center gap-4 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+                <div class="text-center">
+                    <div class="text-2xl font-extrabold ${r.overall_score >= 7 ? 'text-emerald-600' : r.overall_score >= 5 ? 'text-amber-500' : 'text-rose-500'} leading-none">${r.overall_score}<span class="text-base text-slate-400">/10</span></div>
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">Overall</div>
+                </div>
+                <div class="w-px h-8 bg-slate-200 mx-1"></div>
+                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ring-1 ring-inset ${recColor}">${r.recommendation}</span>
             </div>
-            <span class="px-4 py-2 rounded-full text-sm font-semibold ${recColor}">${r.recommendation}</span>
         </div>
 
         ${Object.keys(r.skill_scores || {}).length ? `
-        <div class="mb-6">
-            <h3 class="font-semibold text-slate-700 mb-3">Skill Scores</h3>
+        <div class="mb-8">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-4">Skill Assessment</h3>
+            <div class="space-y-4 max-w-2xl">
             ${Object.entries(r.skill_scores).map(([skill, score]) => `
-                <div class="mb-2">
-                    <div class="flex justify-between text-sm mb-1"><span>${skill}</span><span>${score}/10</span></div>
-                    <div class="bg-slate-100 rounded-full h-2">
-                        <div class="h-2 rounded-full ${score >= 7 ? 'bg-green-500' : score >= 5 ? 'bg-yellow-500' : 'bg-red-400'}" style="width:${(score / 10) * 100}%"></div>
+                <div>
+                    <div class="flex justify-between text-sm font-semibold text-slate-700 mb-1.5"><span>${skill}</span><span>${score}/10</span></div>
+                    <div class="bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                        <div class="h-2.5 rounded-full ${score >= 7 ? 'bg-emerald-500' : score >= 5 ? 'bg-amber-500' : 'bg-rose-500'}" style="width:${(score / 10) * 100}%"></div>
                     </div>
                 </div>`).join("")}
+            </div>
         </div>` : ""}
 
-        <div class="grid md:grid-cols-2 gap-6 mb-6">
-            <div>
-                <h3 class="font-semibold text-slate-700 mb-2">✅ Strengths</h3>
-                <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
-                    ${(r.strengths || []).map(s => `<li>${s}</li>`).join("")}
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-emerald-50/50 border border-emerald-100 p-6 rounded-xl">
+                <h3 class="font-bold text-emerald-800 text-sm uppercase tracking-wider flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"></path></svg>
+                    Strengths
+                </h3>
+                <ul class="text-sm font-medium text-emerald-700 space-y-2">
+                    ${(r.strengths || []).map(s => `<li class="flex gap-2"><span class="text-emerald-400 mt-0.5">•</span> <span>${s}</span></li>`).join("")}
                 </ul>
             </div>
-            <div>
-                <h3 class="font-semibold text-slate-700 mb-2">⚠️ Weaknesses</h3>
-                <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
-                    ${(r.weaknesses || []).map(w => `<li>${w}</li>`).join("")}
+            <div class="bg-amber-50/50 border border-amber-100 p-6 rounded-xl">
+                <h3 class="font-bold text-amber-800 text-sm uppercase tracking-wider flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    Areas to Improve
+                </h3>
+                <ul class="text-sm font-medium text-amber-700 space-y-2">
+                    ${(r.weaknesses || []).map(w => `<li class="flex gap-2"><span class="text-amber-400 mt-0.5">•</span> <span>${w}</span></li>`).join("")}
                 </ul>
             </div>
         </div>
 
-        <div class="bg-slate-50 rounded-xl p-5 mb-4">
-            <h3 class="font-semibold text-slate-700 mb-2">Final Feedback</h3>
-            <p class="text-sm text-slate-600 leading-relaxed">${r.final_feedback}</p>
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-2">Final Feedback</h3>
+            <p class="text-sm font-medium text-slate-600 leading-relaxed">${r.final_feedback}</p>
         </div>
 
         ${(r.next_steps || []).length ? `
-        <div>
-            <h3 class="font-semibold text-slate-700 mb-2">➡️ Next Steps</h3>
-            <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
-                ${r.next_steps.map(s => `<li>${s}</li>`).join("")}
+        <div class="mb-8">
+            <h3 class="font-bold text-slate-800 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
+                Next Steps
+            </h3>
+            <ul class="text-sm font-medium text-slate-600 space-y-2">
+                ${r.next_steps.map(s => `<li class="flex gap-2"><span class="text-indigo-400 mt-0.5">•</span> <span>${s}</span></li>`).join("")}
             </ul>
         </div>` : ""}
 
-        <button onclick="location.reload()"
-            class="mt-6 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-semibold transition">
-            ← Practice Again
-        </button>`
+        <div class="pt-6 border-t border-slate-100 text-center sm:text-left">
+            <button onclick="location.reload()"
+                class="bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-500/20 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-sm">
+                ← Start Another Practice Session
+            </button>
+        </div>`
 
             show("finalReport")
             document.getElementById("finalReport").scrollIntoView({ behavior: "smooth" })
@@ -309,7 +390,7 @@
             input.value = ""
             input.disabled = true
             sendBtn.disabled = true
-            sendBtn.textContent = "…"
+            sendBtn.innerHTML = `<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>`
             addTyping()
 
             try {
@@ -330,10 +411,12 @@
                 showEvaluation(data.evaluation)
 
                 if (data.type === "completed") {
-                    addMsg("ai", "🎉 Practice complete! Here's your report.")
-                    hide("chatSection")
-                    hide("progressBar")
-                    showFinalReport(data.final_report)
+                    addMsg("ai", "🎉 Practice complete! Generating your comprehensive feedback report...")
+                    setTimeout(() => {
+                        hide("chatSection")
+                        hide("progressBar")
+                        showFinalReport(data.final_report)
+                    }, 1000);
                     return
                 }
 
@@ -351,6 +434,13 @@
                 input.focus()
             }
         }
+    </script>
+    
+
+    <script src="../src/js/navbar.js"></script>
+    <script>
+        loadNavbar("../components/navbar.html");
+        loadNavbar("../components/footer.html");
     </script>
 </body>
 

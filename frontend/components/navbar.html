@@ -1,50 +1,52 @@
-<nav class="bg-gray-900 shadow-lg">
-    <div class="max-w-7xl mx-auto px-4">
+<nav class="bg-slate-900 border-b border-slate-800 shadow-sm sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
-
             <!-- Logo -->
             <div class="flex items-center gap-8">
-                <a id="navLogo" href="#" class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">M</span>
+                <a id="navLogo" href="/" class="flex items-center gap-3 group">
+                    <div
+                        class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center shadow-inner group-hover:bg-indigo-500 transition-colors">
+                        <span class="text-white font-bold text-lg leading-none">M</span>
                     </div>
-                    <span class="text-white font-bold text-lg">MAS</span>
+                    <span class="text-white font-bold text-xl tracking-tight">MAS</span>
                 </a>
 
                 <!-- Candidate Links -->
-                <div id="candidateNav" style="display:none" class="flex gap-2">
-                    <a href="/frontend/pages/candidate/jobs.html"
-                        class="rounded-md px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition">Jobs</a>
+                <div id="candidateNav" style="display:none" class="hidden md:flex gap-1">
                     <a href="/frontend/pages/candidate/candidate_dashboard.html"
-                        class="rounded-md px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition">My Applications</a>
+                        class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">My
+                        Dashboard</a>
+                    <a href="/frontend/pages/candidate/jobs.html"
+                        class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">Jobs</a>
                     <a href="/frontend/pages/pratice.html"
-                        class="rounded-md px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition">Practice Interview</a>
+                        class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">Practice
+                        Interview</a>
                 </div>
 
                 <!-- HR Links -->
-                <div id="hrNav" style="display:none" class="flex gap-2">
+                <div id="hrNav" style="display:none" class="hidden md:flex gap-1">
                     <a href="/frontend/pages/hr/hr_dashboard.html"
-                        class="rounded-md px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition">Dashboard</a>
+                        class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">Dashboard</a>
                     <a href="/frontend/pages/hr/applications.html"
-                        class="rounded-md px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition">Applications</a>
+                        class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">Applications</a>
                     <a href="/frontend/pages/hr/create_job.html"
-                        class="rounded-md px-3 py-2 text-sm text-gray-300 hover:text-white hover:bg-gray-700 transition">Post Job</a>
+                        class="rounded-lg px-3 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-all">Post
+                        Job</a>
                 </div>
             </div>
 
             <!-- Right side -->
-            <div class="flex items-center gap-3">
-                <span id="navUsername" style="display:none" class="text-gray-400 text-sm"></span>
+            <div class="flex items-center gap-4">
+                <span id="navUsername" style="display:none" class="text-slate-400 text-sm font-medium"></span>
                 <a id="loginLink" href="/frontend/components/login.html"
-                    class="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-500 transition">
+                    class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all">
                     Login
                 </a>
                 <button id="logoutBtn" style="display:none"
-                    class="rounded-md bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-500 transition">
+                    class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-rose-500 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 focus:ring-offset-slate-900 transition-all">
                     Logout
                 </button>
             </div>
-
         </div>
     </div>
 </nav>

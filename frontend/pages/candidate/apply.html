@@ -2,39 +2,98 @@
 <html>
 
 <head>
+    <!-- Auth guard: runs before page content, redirects if unauthorized -->
+    <script src="../../src/js/auth_guard.js" type="module"></script>
+    <script type="module">
+        import { requireCandidate } from "../../src/js/auth_guard.js";
+        requireCandidate();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apply For Job</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-slate-50 antialiased text-slate-900">
 
-    <div class="max-w-4xl mx-auto mt-10">
+    <div id="navbar"></div>
 
-        <div id="navbar"></div>
+    <div class="max-w-3xl mx-auto mt-10 px-4 mb-20">
 
-        <div class="bg-white p-8 rounded-xl shadow">
+        <!-- Go Back Link -->
+        <a href="javascript:history.back()"
+            class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 mb-6 transition-colors">
+            <svg class="mr-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18">
+                </path>
+            </svg>
+            Back to Job Details
+        </a>
 
-            <h1 class="text-3xl font-bold mb-2">Apply For Job</h1>
-            <p class="text-gray-500 mb-6">Upload your resume to check eligibility</p>
+        <div class="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-slate-200">
+            <div class="mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Submit Your Application</h1>
+                <p class="text-slate-500">Upload your latest resume to check your eligibility instantly.</p>
+            </div>
 
-            <input type="file" id="resumeFile" accept=".pdf,.docx" class="mb-4 block">
+            <!-- Custom File Input Area -->
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Resume Document</label>
+                <div class="flex items-center justify-center w-full">
+                    <label for="resumeFile"
+                        class="flex flex-col items-center justify-center w-full h-40 border-2 border-slate-300 border-dashed rounded-xl cursor-pointer bg-slate-50 hover:bg-slate-100 hover:border-indigo-400 transition-colors">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                            <svg class="w-10 h-10 mb-3 text-slate-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                </path>
+                            </svg>
+                            <p class="mb-1 text-sm text-slate-600 font-semibold"><span class="text-indigo-600">Click to
+                                    upload</span> or drag and drop</p>
+                            <p class="text-xs text-slate-500">PDF or DOCX (Max 5MB)</p>
+                        </div>
+                        <input type="file" id="resumeFile" accept=".pdf,.docx" class="hidden"
+                            onchange="updateFileName(this)">
+                    </label>
+                </div>
+                <p id="fileNameDisplay" class="mt-2 text-sm text-indigo-600 font-medium hidden flex items-center gap-1">
+                </p>
+            </div>
 
-            <button
-                onclick="checkEligibility()"
-                id="checkBtn"
-                class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition">
+            <button onclick="checkEligibility()" id="checkBtn"
+                class="w-full bg-indigo-600 text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/20 transition-all disabled:opacity-70 disabled:cursor-not-allowed">
                 Check Eligibility
             </button>
-
         </div>
 
-        <div id="resultContainer" class="mt-6"></div>
+        <div id="resultContainer" class="mt-8"></div>
 
     </div>
+
+    <div id="footer"></div>
 
     <script src="../../src/js/navbar.js"></script>
     <script>
         loadNavbar("../../components/navbar.html");
+
+        // UI helper to show selected file name
+        function updateFileName(input) {
+            const display = document.getElementById("fileNameDisplay");
+            if (input.files && input.files.length > 0) {
+                display.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Selected: ${input.files[0].name}`;
+                display.classList.remove("hidden");
+            } else {
+                display.classList.add("hidden");
+            }
+        }
     </script>
 
     <script>
@@ -48,7 +107,7 @@
             const file = document.getElementById("resumeFile").files[0]
 
             if (!file) {
-                alert("Please upload your resume")
+                alert("Please upload your resume first")
                 return
             }
 
@@ -61,7 +120,7 @@
 
             const btn = document.getElementById("checkBtn")
             btn.disabled = true
-            btn.textContent = "Checking..."
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analyzing Resume...`
 
             const formData = new FormData()
             formData.append("file", file)
@@ -85,7 +144,6 @@
                     return
                 }
 
-                // Store application_id for the interview start call
                 if (result.application_id) {
                     applicationId = result.application_id
                     localStorage.setItem("application_id", applicationId)
@@ -106,45 +164,70 @@
         function displayResult(result) {
             const container = document.getElementById("resultContainer")
 
+            // Tailwind HTML template updates
             if (result.eligible) {
                 container.innerHTML = `
-                    <div class="bg-green-100 p-6 rounded-xl">
-                        <h2 class="text-2xl font-bold text-green-700">✅ You're Eligible!</h2>
+                    <div class="bg-emerald-50 border border-emerald-200 p-8 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-emerald-100 text-emerald-600 rounded-full p-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <h2 class="text-2xl font-bold text-emerald-800">You're Eligible!</h2>
+                        </div>
 
-                        <p class="mt-3 text-gray-700">
-                            <strong>Eligibility Score:</strong> ${result.score}/100
-                        </p>
+                        <div class="mb-5 flex items-center gap-2">
+                            <span class="text-emerald-900 font-medium">Match Score:</span> 
+                            <div class="w-full bg-emerald-200 rounded-full h-2.5 max-w-xs">
+                                <div class="bg-emerald-500 h-2.5 rounded-full" style="width: ${result.score}%"></div>
+                            </div>
+                            <span class="text-emerald-700 font-bold ml-2">${result.score}%</span>
+                        </div>
 
-                        <ul class="mt-3 space-y-1">
-                            ${result.reasons.map(r => `<li>• ${r}</li>`).join("")}
-                        </ul>
+                        <div class="bg-white/60 rounded-xl p-4 border border-emerald-100 mb-6">
+                            <h3 class="text-emerald-800 font-semibold mb-2 text-sm uppercase tracking-wider">Analysis Highlights</h3>
+                            <ul class="space-y-2 text-emerald-700 text-sm">
+                                ${result.reasons.map(r => `<li class="flex items-start"><svg class="w-4 h-4 mr-2 mt-0.5 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>${r}</li>`).join("")}
+                            </ul>
+                        </div>
 
                         <button
                             onclick="goToInterview()"
-                            class="mt-5 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded font-semibold transition">
-                            Start Interview →
+                            class="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-sm focus:ring-4 focus:ring-emerald-500/30">
+                            Proceed to Interview
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </button>
                     </div>
                 `
             } else {
                 container.innerHTML = `
-                    <div class="bg-red-100 p-6 rounded-xl">
-                        <h2 class="text-2xl font-bold text-red-700">❌ Not Eligible</h2>
+                    <div class="bg-rose-50 border border-rose-200 p-8 rounded-2xl shadow-sm">
+                         <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-rose-100 text-rose-600 rounded-full p-2">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </div>
+                            <h2 class="text-2xl font-bold text-rose-800">Not Eligible</h2>
+                        </div>
 
-                        <p class="mt-2 text-gray-600">
-                            Your profile doesn't meet the requirements for this role.
+                        <p class="mb-5 text-rose-700 font-medium">
+                            We're sorry, but your profile doesn't currently meet the primary requirements for this specific role.
                         </p>
 
-                        <ul class="mt-3 space-y-1">
-                            ${result.reasons.map(r => `<li>• ${r}</li>`).join("")}
-                        </ul>
+                        <div class="bg-white/60 rounded-xl p-4 border border-rose-100">
+                            <h3 class="text-rose-800 font-semibold mb-2 text-sm uppercase tracking-wider">Missing Requirements</h3>
+                            <ul class="space-y-2 text-rose-700 text-sm">
+                                ${result.reasons.map(r => `<li class="flex items-start"><svg class="w-4 h-4 mr-2 mt-0.5 shrink-0 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>${r}</li>`).join("")}
+                            </ul>
+                        </div>
+                        
+                        <a href="jobs.html" class="inline-block mt-6 text-rose-700 font-semibold hover:text-rose-800 hover:underline">
+                            ← Browse other opportunities
+                        </a>
                     </div>
                 `
             }
         }
 
         function goToInterview() {
-            // Pass application_id and job_id to the interview page via URL
             const appId = applicationId || localStorage.getItem("application_id")
 
             if (!appId) {
@@ -154,8 +237,7 @@
 
             window.location.href = `../interview.html?application_id=${appId}&job_id=${jobId}`
         }
-
     </script>
-
 </body>
+
 </html>

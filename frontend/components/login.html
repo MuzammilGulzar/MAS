@@ -1,74 +1,63 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="../dist/css/tailwind.css">
+    <title>Login - MAS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
 
-    ```
-    <div class="bg-amber-100 p-6 md:p-8 rounded-xl shadow-md w-full max-w-sm">
+    <div class="bg-white p-8 md:p-10 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 w-full max-w-md">
 
-        <h1 class="text-2xl font-bold text-center mb-6">
-            Welcome Back
-        </h1>
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-12 h-12 bg-indigo-600 rounded-xl mb-4 shadow-inner">
+                <span class="text-white font-bold text-2xl leading-none">M</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900">Welcome Back</h1>
+            <p class="text-sm text-slate-500 mt-2">Please sign in to your account</p>
+        </div>
 
         <form id="loginForm">
-
             <!-- Username -->
             <div class="mb-5">
-                <label class="block mb-2 text-sm font-medium text-gray-700">
-                    Username
-                </label>
-
-                <input type="text" id="username" name="username" placeholder="john_doe" required
-                    class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full px-3 py-2.5 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                <label class="block mb-1.5 text-sm font-semibold text-slate-700">Username</label>
+                <input type="text" id="username" name="username" placeholder="e.g. john_doe" required
+                    class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 placeholder:text-slate-400">
             </div>
 
             <!-- Password -->
-            <div class="mb-5">
-                <label class="block mb-2 text-sm font-medium text-gray-700">
-                    Password
-                </label>
-
+            <div class="mb-6">
+                <div class="flex justify-between mb-1.5">
+                    <label class="block text-sm font-semibold text-slate-700">Password</label>
+                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                </div>
                 <input type="password" id="password" name="password" placeholder="••••••••" required
-                    class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full px-3 py-2.5 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-all focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 placeholder:text-slate-400">
             </div>
 
-            <p id="message" class="text-sm mb-4 text-center">
-            </p>
+            <!-- Error / Success Message -->
+            <p id="message" class="text-sm mb-4 text-center text-rose-600 font-medium empty:hidden"></p>
 
             <button type="submit"
-                class="w-full text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-sm px-4 py-2.5">
-
-                Login
-
+                class="w-full text-white bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500/20 font-semibold rounded-lg text-sm px-4 py-3 transition-colors">
+                Sign In
             </button>
 
-            <p class="text-center text-sm mt-4">
-
+            <p class="text-center text-sm text-slate-600 mt-6">
                 Don't have an account?
-
-                <a href="join.html" class="text-blue-600 hover:underline">
-
-                    Register
-
-                </a>
-
+                <a href="join.html" class="font-medium text-indigo-600 hover:text-indigo-500 hover:underline">Register now</a>
             </p>
-
         </form>
 
     </div>
 
     <script src="../src/js/login.js"></script>
-    ```
 
 </body>
-
 </html>

@@ -1,31 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <!-- Auth guard: runs before page content, redirects if unauthorized -->
+    <script src="../../src/js/auth_guard.js" type="module"></script>
+    <script type="module">
+        import { requireCandidate } from "../../src/js/auth_guard.js";
+        requireCandidate();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Candidate Dashboard</title>
-    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body class="bg-slate-100">
 
-    <div id="navbar"></div>
-    <div class="max-w-7xl mx-auto p-8">
+<body class="bg-slate-50 antialiased text-slate-900">
+    <section>
 
-        <h1 class="text-4xl font-bold mb-8">
-            Candidate Dashboard
-        </h1>
+        <div id="navbar"></div>
 
-        <div id="applicationsContainer"
-             class="space-y-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+            <div class="mb-8">
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">
+                    My Dashboard
+                </h1>
+                <p class="text-slate-500 mt-2">Track the status of your recent applications and interviews.</p>
+            </div>
+
+            <!-- The styling for the applications injected by candidate_dashboard.js 
+        can also use Tailwind classes for cards, borders, and status badges -->
+            <div id="applicationsContainer" class="space-y-4">
+                <!-- Applications will be loaded here -->
+            </div>
+
         </div>
+    </section>
 
-    </div>
+    <div id="footer"></div>
+
     <script src="../../src/js/navbar.js"></script>
-
     <script>
         loadNavbar("../../components/navbar.html");
+    </script>
+    <script src="../../src/js/footer.js"></script>
+    <script>
+        loadFooter("../../components/footer.html");
     </script>
     <script src="../../src/js/candidate_dashboard.js"></script>
 
 </body>
+
 </html>

@@ -2,73 +2,83 @@
 <html lang="en">
 
 <head>
-    <script src="../../src/js/auth_quard.js" type="module"></script>
+    <script src="../../src/js/auth_guard.js" type="module"></script>
     <script type="module">
-        import { requireHR } from "../../src/js/auth_quard.js";
+        import { requireHR } from "../../src/js/auth_guard.js";
         requireHR();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Applications - MAS HR</title>
-    <link rel="stylesheet" href="../../dist/css/tailwind.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-slate-50 min-h-screen text-slate-900 antialiased">
 
     <div id="navbar"></div>
 
-    <div class="max-w-6xl mx-auto px-6 py-10">
+    <div class="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-10">
 
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">All Applications</h1>
-                <p class="text-gray-500 mt-1">Review candidates and make hiring decisions</p>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">All Applications</h1>
+                <p class="text-slate-500 mt-1">Review candidates, scores, and make hiring decisions.</p>
             </div>
-            <select id="statusFilter" onchange="filterApplications()"
-                class="border border-gray-300 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="all">All Statuses</option>
-                <option value="applied">Applied</option>
-                <option value="interview_pending">Interview Pending</option>
-                <option value="interview_completed">Interview Completed</option>
-                <option value="shortlisted">Shortlisted</option>
-                <option value="hired">Hired</option>
-                <option value="rejected">Rejected</option>
-            </select>
-        </div>
-
-        <div id="loading" class="text-center py-12">
-            <div class="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3">
+            
+            <div class="relative min-w-[200px]">
+                <select id="statusFilter" onchange="filterApplications()"
+                    class="w-full appearance-none bg-white border border-slate-300 rounded-xl pl-4 pr-10 py-2.5 text-m font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-all cursor-pointer">
+                    <option value="all">All Statuses</option>
+                    <option value="applied">Applied</option>
+                    <option value="interview_pending">Interview Pending</option>
+                    <option value="interview_completed">Interview Completed</option>
+                    <option value="shortlisted">Shortlisted</option>
+                    <option value="hired">Hired</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </div>
             </div>
-            <p class="text-gray-500">Loading applications...</p>
         </div>
 
-        <div id="empty" class="hidden text-center py-16 bg-white rounded-2xl">
-            <p class="text-4xl mb-4">📋</p>
-            <p class="text-gray-500">No applications found</p>
+        <div id="loading" class="text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 border-4 border-slate-100 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4">
+            </div>
+            <p class="text-slate-500 font-medium">Loading applications...</p>
         </div>
 
-        <div id="tableContainer" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-gray-50 border-b border-gray-100">
+        <div id="empty" class="hidden text-center py-20 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-1">No Applications Found</h3>
+            <p class="text-slate-500">There are currently no applications matching this criteria.</p>
+        </div>
+
+        <div id="tableContainer" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-x-auto">
+            <table class="w-full text-left whitespace-nowrap table-fixed">
+                <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                            Candidate</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Job
-                        </th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                            Resume Score</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                            Interview Score</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                            Status</th>
-                        <th class="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                            Decision</th>
+                        <th class="px-6 py-4 text-s font-bold text-slate-500 uppercase tracking-wider">Candidate Info</th>
+                        <th class="px-6 py-4 text-s font-bold text-slate-500 uppercase tracking-wider">Job Role</th>
+                        <th class="px-6 py-4 text-s font-bold text-slate-500 uppercase tracking-wider">Resume Score</th>
+                        <th class="px-6 py-4 text-s font-bold text-slate-500 uppercase tracking-wider">Interview</th>
+                        <th class="px-6 py-4 text-s font-bold text-slate-500 uppercase tracking-wider">Report</th>
+                        <!-- <th class="px-6 py-4 text-s font-bold text-slate-500 uppercase tracking-wider">Status</th> -->
+                        <th class="px-6 py-4 text-s font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
+                <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
             </table>
         </div>
     </div>
+
+    <div id="footer"></div>
 
     <script>
         const token = localStorage.getItem("access_token")
@@ -77,48 +87,45 @@
         let allApplications = []
 
         const STATUS_COLORS = {
-            "applied": "gray",
+            "applied": "slate",
             "interview_pending": "blue",
-            "interview_in_progress": "yellow",
+            "interview_in_progress": "amber",
             "interview_completed": "purple",
-            "shortlisted": "green",
-            "hired": "green",
-            "rejected": "red",
-            "eligible": "green",
-            "not_eligible": "red",
+            "shortlisted": "emerald",
+            "hired": "emerald",
+            "rejected": "rose",
+            "eligible": "emerald",
+            "not_eligible": "rose",
         }
 
         function badge(status) {
-            const color = STATUS_COLORS[status] || "gray"
+            const color = STATUS_COLORS[status] || "slate"
             const label = status ? status.replace(/_/g, " ") : "—"
-            return `<span class="bg-${color}-100 text-${color}-700 text-xs px-2.5 py-1 rounded-full font-medium capitalize">${label}</span>`
+            return `<span class="bg-${color}-50 text-${color}-700 ring-1 ring-inset ring-${color}-600/20 text-s px-2.5 py-1 rounded-full font-semibold capitalize tracking-wide inline-flex items-center">${label}</span>`
         }
 
         function decisionButtons(app) {
             // Only show decision buttons if interview is completed and no final decision yet
             const decidable = app.status === "interview_completed"
-            if (!decidable) return "—"
-
+            
             return `
-        <div class="flex gap-2">
+        <div class="flex items-center justify-end gap-2">
+            <a href="application_details.html?id=${app.application_id}" class="text-m font-semibold text-indigo-600 hover:text-indigo-800 transition-colors mr-3">View</a>
+            ${decidable ? `
             <button onclick="makeDecision(${app.application_id}, 'shortlisted')"
-                class="text-xs bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded-lg font-medium transition">
+                class="text-s bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg font-semibold transition-colors">
                 Shortlist
             </button>
-            <button onclick="makeDecision(${app.application_id}, 'hired')"
-                class="text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 px-3 py-1 rounded-lg font-medium transition">
-                Hire
-            </button>
             <button onclick="makeDecision(${app.application_id}, 'rejected')"
-                class="text-xs bg-red-100 text-red-700 hover:bg-red-200 px-3 py-1 rounded-lg font-medium transition">
+                class="text-s bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-lg font-semibold transition-colors">
                 Reject
             </button>
+            ` : ''}
         </div>`
         }
 
         async function loadApplications() {
             try {
-                // ── FIXED: correct endpoint + auth token ────────────────
                 const res = await fetch("http://127.0.0.1:8000/hr/applications", { headers: AUTH })
 
                 if (!res.ok) {
@@ -131,7 +138,7 @@
                 renderTable(allApplications)
             } catch (e) {
                 document.getElementById("loading").innerHTML =
-                    `<p class="text-red-500 text-center">${e.message}</p>`
+                    `<p class="text-rose-500 font-medium text-center">${e.message}</p>`
             }
         }
 
@@ -152,30 +159,39 @@
                 const resumeScore = app.resume_score ? `${app.resume_score}/100` : "—"
                 const interviewScore = app.interview_report ? `${app.interview_report.overall_score}/10` : "—"
                 const applied = app.applied_at
-                    ? new Date(app.applied_at).toLocaleDateString("en-US", { day: "numeric", month: "short" })
+                    ? new Date(app.applied_at).toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
                     : "—"
+                
+                // Determine highlight colors based on scores
+                const scoreColor = app.resume_score >= 70 ? 'text-emerald-600' : (app.resume_score >= 50 ? 'text-amber-600' : 'text-slate-700');
+                const intScoreColor = app.interview_report ? (app.interview_report.overall_score >= 7 ? 'text-emerald-600' : (app.interview_report.overall_score >= 5 ? 'text-amber-600' : 'text-rose-600')) : 'text-slate-700';
+
+                const reportLink = app.interview_report 
+                    ? `<a href="application_details.html?id=${app.application_id}" class="inline-flex items-center gap-1 text-m font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> View</a>` 
+                    : `<span class="text-m text-slate-400 font-medium">—</span>`;
 
                 tbody.innerHTML += `
-            <tr class="hover:bg-gray-50 transition" id="row-${app.application_id}">
+            <tr class="hover:bg-slate-50 transition-colors group" id="row-${app.application_id}">
                 <td class="px-6 py-4">
-                    <div class="font-medium text-gray-900 text-sm">${app.candidate_name}</div>
-                    <div class="text-xs text-gray-400">${app.candidate_email}</div>
-                    <div class="text-xs text-gray-300">${applied}</div>
+                    <div class="font-bold text-slate-900 text-m group-hover:text-indigo-600 transition-colors">${app.candidate_name}</div>
+                    <div class="text-m text-slate-500 mt-0.5">${app.candidate_email}</div>
+                    <div class="text-m text-slate-400 mt-0.5">${applied}</div>
                 </td>
                 <td class="px-6 py-4">
-                    <div class="text-sm text-gray-900">${app.job_title}</div>
-                    <div class="text-xs text-gray-400">${app.job_fit || ""}</div>
+                    <div class="text-m font-semibold text-slate-800">${app.job_title}</div>
+                    <div class="text-s text-slate-500 mt-0.5 truncate max-w-[200px]">${app.job_fit || "Review needed"}</div>
                 </td>
                 <td class="px-6 py-4">
-                    <span class="text-sm font-semibold text-gray-700">${resumeScore}</span>
+                    <span class="text-m font-extrabold ${scoreColor}">${resumeScore}</span>
                 </td>
                 <td class="px-6 py-4">
-                    <span class="text-sm font-semibold text-gray-700">${interviewScore}</span>
-                    ${app.interview_report ? `<div class="text-xs text-gray-400">${app.interview_report.recommendation || ""}</div>` : ""}
+                    <span class="text-m font-extrabold ${intScoreColor}">${interviewScore}</span>
+                    ${app.interview_report ? `<div class="text-s text-slate-500 mt-0.5 font-medium">${app.interview_report.recommendation || ""}</div>` : ""}
                 </td>
+                <!--<td class="px-6 py-4">${reportLink}</td>  -->   <!-- report link is now in the interview column -->
                 <td class="px-6 py-4">${badge(app.status)}</td>
-                <td class="px-6 py-4" id="decision-${app.application_id}">${decisionButtons(app)}</td>
-            </tr>`
+                <td class="px-6 py-4 text-right" id="decision-${app.application_id}">${decisionButtons(app)}</td>
+                </tr>`
             })
         }
 
@@ -197,17 +213,16 @@
                 }
 
                 // Update the row in place without full reload
-                const decisionCell = document.getElementById(`decision-${applicationId}`)
-                if (decisionCell) decisionCell.innerHTML = badge(decision)
-
-                // Update local data
                 const app = allApplications.find(a => a.application_id === applicationId)
                 if (app) app.status = decision
+                
+                const decisionCell = document.getElementById(`decision-${applicationId}`)
+                if (decisionCell) decisionCell.innerHTML = decisionButtons(app) // re-render buttons
 
-                // Update status cell
+                // Update status cell (Index is now 5 because we added the Report column)
                 const row = document.getElementById(`row-${applicationId}`)
                 if (row) {
-                    const statusCell = row.querySelectorAll("td")[4]
+                    const statusCell = row.querySelectorAll("td")[5]
                     if (statusCell) statusCell.innerHTML = badge(decision)
                 }
 
@@ -229,5 +244,4 @@
         loadApplications()
     </script>
 </body>
-
 </html>

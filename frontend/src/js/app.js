@@ -1,6 +1,3 @@
-
-
-// app.js v2 — updated
 let sessionId = null;
 let currentQuestionId = null;
 

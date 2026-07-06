@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../dist/css/tailwind.css">
+</head>
+
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+
+    ```
+    <div class="bg-amber-100 p-6 md:p-8 rounded-xl shadow-md w-full max-w-sm">
+
+        <h1 class="text-2xl font-bold text-center mb-6">
+            Welcome Back
+        </h1>
+
+        <form id="loginForm">
+
+            <!-- Username -->
+            <div class="mb-5">
+                <label class="block mb-2 text-sm font-medium text-gray-700">
+                    Username
+                </label>
+
+                <input type="text" id="username" name="username" placeholder="john_doe" required
+                    class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full px-3 py-2.5 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <!-- Password -->
+            <div class="mb-5">
+                <label class="block mb-2 text-sm font-medium text-gray-700">
+                    Password
+                </label>
+
+                <input type="password" id="password" name="password" placeholder="••••••••" required
+                    class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg block w-full px-3 py-2.5 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <p id="message" class="text-sm mb-4 text-center">
+            </p>
+
+            <button type="submit"
+                class="w-full text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-sm px-4 py-2.5">
+
+                Login
+
+            </button>
+
+            <p class="text-center text-sm mt-4">
+
+                Don't have an account?
+
+                <a href="join.html" class="text-blue-600 hover:underline">
+
+                    Register
+
+                </a>
+
+            </p>
+
+        </form>
+
+    </div>
+
+    <script src="../src/js/login.js"></script>
+    ```
+
+</body>
+
+</html>
