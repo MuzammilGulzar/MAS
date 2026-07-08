@@ -140,7 +140,7 @@ def normalize_interview_plan_data(data: dict) -> dict:
     return data
 
 
-def create_interview_plan(resume_analysis, job):
+def create_interview_plan(resume_analysis, job=None):
 #     prompt = f"""
 # You are an expert interview planner.
 
